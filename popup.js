@@ -1,29 +1,57 @@
+function getScripts() {
+  return new Promise(resolve => {
+    chrome.storage.local.get(['scripts'], data => {
+      resolve(data.scripts || []);
+    });
+  });
+}
+
+function saveScripts(scripts) {
+  return new Promise(resolve => {
+    chrome.storage.local.set({ scripts }, resolve);
+  });
+}
+
+function getActiveTab() {
+  return new Promise(resolve => {
+    chrome.tabs.getSelected(resolve);
+  });
+}
+
+function executeScript(code) {
+  return new Promise(resolve => {
+    chrome.tabs.executeScript({ code }, resolve);
+  });
+}
+
+function saveClick(event) {
+  const reload = event.target.getAttribute('reload') !== null;
+
+  currentScript.code = editor.getValue();
+  currentScript.enabled = !!enabledEl.checked;
+
+  saveScripts(allScripts).then(() => {
+    const code = (currentScript.enabled && currentScript.code) ?
+      `localStorage['RunJsOnPageStart'] = ${JSON.stringify(currentScript.code)}` :
+      `delete localStorage['RunJsOnPageStart']`;
+    return executeScript(code);
+  }).then(() => {
+    window.close();
+    if (reload) {
+      chrome.tabs.reload();
+    }
+  });
+}
+
 const codeEl = document.querySelector('.code');
 const enabledEl = document.querySelector('.footer input[type="checkbox"]');
 const btnEls = document.querySelectorAll('.footer button');
 
-const codeKey = 'RunJsOnPageStart';
+let allScripts;
+let currentScript;
+let activeTab;
 
-function saveSettings(reload) {
-  const enabled = enabledEl.checked;
-  const code = editor.getValue();
-
-  // save settings
-  chrome.storage.local.set({ settings: { enabled, code } }, () => {
-
-    // update code in active tab
-    chrome.tabs.executeScript({
-      code: (enabled && code) ? `localStorage['${codeKey}'] = ${JSON.stringify(code)}` :
-        `delete localStorage['${codeKey}']`
-    }, function() {
-      // close popup & reload active tab
-      window.close();
-      if (reload) {
-        chrome.tabs.reload();
-      }
-    });
-  });
-}
+btnEls.forEach(btn => btn.addEventListener('click', saveClick));
 
 // Init editor
 const editor = ace.edit(codeEl);
@@ -36,16 +64,19 @@ editor.setOptions({
   useSoftTabs: true
 });
 
-// Get settings from storage
-chrome.storage.local.get(['settings'], data => {
-  const settings = data.settings || {};
-  editor.setValue(settings.code || '');
-  editor.selection.cursor.setPosition(0);
-  enabledEl.checked = !!settings.enabled;
-});
+// Get scripts and active tab
+Promise.all([getScripts(), getActiveTab()]).then(res => {
+  [allScripts, activeTab] = res;
 
-btnEls.forEach(btn => {
-  btn.addEventListener('click', () => {
-    saveSettings(btn.getAttribute('reload') !== null);
-  });
+  const origin = new URL(activeTab.url).origin;
+
+  currentScript = allScripts.find(s => s.origin === origin);
+  if (!currentScript) {
+    currentScript = { origin, code: '', enabled: true };
+    allScripts.push(currentScript);
+  }
+
+  editor.setValue(currentScript.code);
+  editor.selection.cursor.setPosition(0);
+  enabledEl.checked = currentScript.enabled;
 });
