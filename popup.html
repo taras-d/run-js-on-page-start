@@ -39,8 +39,11 @@
         text-align: right;
         border-top: 1px solid var(--border-color);
       }
-      .footer label {
+      .footer .enabled {
         float: left;
+      }
+      .footer .enabled * {
+        vertical-align: middle;
       }
       .footer button {
         color: inherit;
@@ -51,8 +54,8 @@
     <header class="panel header">Run javascript code before page starts loading</header>
     <div class="code"></div>
     <footer class="panel footer">
-      <label>
-        <input type="checkbox"> enabled
+      <label class="enabled">
+        <input type="checkbox"><span>enabled</span>
       </label>
       <button>Save</button>
       <button reload>Save & reload</button>
