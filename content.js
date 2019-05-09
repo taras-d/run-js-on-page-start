@@ -1,19 +1,6 @@
-const storageKey = 'RunJsOnPageStart';
-
-chrome.runtime.onMessage.addListener(msg => {
-  if (msg.type === 'apply') {
-    const settings = msg.data;
-    if (settings.enabled) {
-      localStorage[storageKey] = settings.code;
-    } else {
-      delete localStorage[storageKey];
-    }
-    window.location.reload();
-  }
-});
-
-if (localStorage[storageKey]) {
+const code = localStorage['RunJsOnPageStart'];
+if (code) {
   const el = document.createElement('script');
-  el.text = localStorage[storageKey];
+  el.text = code;
   document.documentElement.appendChild(el);
 }
