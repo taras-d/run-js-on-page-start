@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RunJsOnPageStart</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        --panel-color: #f3f3f3;
+        --border-color: #d0d0d0;
+        --text-color: #5a5a5a;
+        font-family: sans-serif;
+        font-size: 12px;
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 300px;
+      }
+      .panel {
+        background-color: var(--panel-color);
+        padding: 3px 6px;
+      }
+      .header {
+        padding-top: 4px;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .code {
+        display: block;
+        width: 100%;
+        height: calc(100% - 44px);
+        border-color: var(--border-color);
+        border-left: 0;
+        border-right: 0;
+      }
+      .footer {
+        text-align: left;
+        border-top: 1px solid var(--border-color);
+      }
+      .footer button {
+        float: right;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="panel header">Run javascript code before page starts loading</header>
+    <div class="code"></div>
+    <footer class="panel footer">
+      <input type="checkbox"> enabled
+      <button>Apply</button>
+    </footer>
+    <script src="ace/ace.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
