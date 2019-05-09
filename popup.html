@@ -10,7 +10,7 @@
       body {
         --panel-color: #f3f3f3;
         --border-color: #d0d0d0;
-        --text-color: #5a5a5a;
+        --text-color: #333;
         font-family: sans-serif;
         font-size: 12px;
         color: var(--text-color);
@@ -21,26 +21,29 @@
       }
       .panel {
         background-color: var(--panel-color);
-        padding: 3px 6px;
+        padding: 4px 6px;
       }
       .header {
-        padding-top: 4px;
+        padding: 6px;
         border-bottom: 1px solid var(--border-color);
       }
       .code {
         display: block;
         width: 100%;
-        height: calc(100% - 44px);
+        height: calc(100% - 54px);
         border-color: var(--border-color);
         border-left: 0;
         border-right: 0;
       }
       .footer {
-        text-align: left;
+        text-align: right;
         border-top: 1px solid var(--border-color);
       }
+      .footer label {
+        float: left;
+      }
       .footer button {
-        float: right;
+        color: inherit;
       }
     </style>
   </head>
@@ -48,8 +51,11 @@
     <header class="panel header">Run javascript code before page starts loading</header>
     <div class="code"></div>
     <footer class="panel footer">
-      <input type="checkbox"> enabled
-      <button>Apply</button>
+      <label>
+        <input type="checkbox"> enabled
+      </label>
+      <button>Save</button>
+      <button reload>Save & reload</button>
     </footer>
     <script src="ace/ace.js"></script>
     <script src="popup.js"></script>
