@@ -25,7 +25,11 @@ function executeScript(code) {
 }
 
 function saveChanges() {
+  const date = new Date();
+  currentScript.createdAt = currentScript.createdAt || date;
+  currentScript.updatedAt = date;
   currentScript.code = editor.getValue();
+
   saveScripts(allScripts).then(() => {
     const code = currentScript.code ?
       `localStorage['RunJsOnPageStart'] = ${JSON.stringify(currentScript.code)}` :
