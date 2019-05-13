@@ -1,10 +1,12 @@
+:root {
+  --panel-bg-color: #f3f3f3;
+  --border-color: #d0d0d0;
+  --link-color: #1155cc;
+}
 * {
   box-sizing: border-box;
 }
 body {
-  --panel-bg-color: #f3f3f3;
-  --border-color: #d0d0d0;
-  --link-color: #1155cc;
   margin: 0;
   padding: 0;
   color: #333;

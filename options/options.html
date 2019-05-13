@@ -4,55 +4,50 @@
     <title>Options - RunJsOnPageStart</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../shared/styles.css">
+    <link rel="stylesheet" href="../common.css">
     <style>
       body {
         padding: 5px;
       }
-      .header {
-        font-size: 14px;
-        font-weight: bold;
-        margin-bottom: 4px;
-      }
       .scripts {
         width: 800px;
         border-collapse: collapse;
+        table-layout: fixed;
       }
       .scripts thead {
         background-color: var(--panel-bg-color);
       }
-      .scripts th {
-        padding: 4px;
-        border: 1px solid var(--border-color);
-      }
+      .scripts th,
       .scripts td {
-        padding: 2px 4px;
-        border: 1px solid #dedede;
-      }
-      .scripts tbody tr:nth-child(odd) {
-        background-color: #f9f9f9;
-      }
-      .scripts tbody tr:last-child td {
-        border-bottom: 1px solid var(--border-color);
+        padding: 3px;
+        border: 1px solid var(--border-color);
+        word-break: break-word;
       }
       .code {
+        overflow: auto;
+      }
+      .code pre {
         margin: 0;
       }
-      .date {
+      .date,
+      .empty {
         color: gray;
+        text-align: center;
+      }
+      .actions {
+        text-align: center;
       }
     </style>
   </head>
   <body>
-    <header class="header">Scripts</header>
-
     <table class="scripts">
       <thead>
         <tr>
           <th style="width: 200px">Origin</th>
           <th>Code</th>
-          <th style="width: 100px">Created</th>
-          <th style="width: 100px">Updated</th>
+          <th style="width: 90px">Created</th>
+          <th style="width: 90px">Updated</th>
+          <th style="width: 50px"></th>
         </tr>
       </thead>
       <tbody>
@@ -61,10 +56,23 @@
 
     <template id="row-tpl">
       <tr>
-        <td><a class="link origin" target="_blank"></a></td>
-        <td><pre class="code"></pre></td>
+        <td class="origin">
+          <a class="link" target="_blank"></a>
+        </td>
+        <td class="code">
+          <pre></pre>
+        </td>
         <td class="date created"></td>
         <td class="date updated"></td>
+        <td class="actions">
+          <a class="link delete">delete</a>
+        </td>
+      </tr>
+    </template>
+
+    <template id="empty-tpl">
+      <tr>
+        <td class="empty" colspan="5">no scripts</td>
       </tr>
     </template>
 
