@@ -38,6 +38,11 @@ let allScripts;
 let currentScript;
 let activeTab;
 
+document.querySelector('.reload-page').addEventListener('click', () => {
+  window.close();
+  chrome.tabs.reload();
+});
+
 // Init editor
 const editor = ace.edit( document.querySelector('.code') );
 editor.setTheme('ace/theme/chrome');

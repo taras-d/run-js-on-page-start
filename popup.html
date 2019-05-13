@@ -23,6 +23,13 @@
         padding: 6px;
         font-weight: bold;
       }
+      .reload-page {
+        font-weight: normal;
+        color: #1155cc;
+        text-decoration: underline;
+        float: right;
+        cursor: pointer;
+      }
       .code {
         display: block;
         width: 100%;
@@ -31,7 +38,10 @@
     </style>
   </head>
   <body>
-    <header class="panel header">Run javascript code before page starts loading</header>
+    <header class="header">
+      Run javascript code before page starts loading
+      <a class="reload-page">reload page</a>
+    </header>
     <div class="code"></div>
     <script src="ace/ace.js"></script>
     <script src="popup.js"></script>
