@@ -24,8 +24,8 @@ function executeScript(code) {
   });
 }
 
-function saveChanges() {
-  const date = new Date();
+function saveChanges(event) {
+  const date = new Date().toJSON();
   currentScript.createdAt = currentScript.createdAt || date;
   currentScript.updatedAt = date;
   currentScript.code = editor.getValue();
@@ -35,17 +35,21 @@ function saveChanges() {
       `localStorage['RunJsOnPageStart'] = ${JSON.stringify(currentScript.code)}` :
       `delete localStorage['RunJsOnPageStart']`;
     return executeScript(code);
+  }).then(() => {
+    window.close();
+    if (event.target.dataset.reload === '') {
+      chrome.tabs.reload();
+    }
   });
 }
+
+document.querySelectorAll('.footer button').forEach(
+  btn => btn.addEventListener('click', saveChanges)
+);
 
 let allScripts;
 let currentScript;
 let activeTab;
-
-document.querySelector('.reload-page').addEventListener('click', () => {
-  window.close();
-  chrome.tabs.reload();
-});
 
 // Init editor
 const editor = ace.edit( document.querySelector('.code') );
@@ -72,6 +76,4 @@ Promise.all([getScripts(), getActiveTab()]).then(res => {
 
   editor.setValue(currentScript.code);
   editor.selection.cursor.setPosition(0);
-
-  editor.on('change', saveChanges);
 });

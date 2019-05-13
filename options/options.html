@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Options - RunJsOnPageStart</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../shared/styles.css">
+    <style>
+      body {
+        padding: 5px;
+      }
+      .header {
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 4px;
+      }
+      .scripts {
+        width: 800px;
+        border-collapse: collapse;
+      }
+      .scripts thead {
+        background-color: var(--panel-bg-color);
+      }
+      .scripts th {
+        padding: 4px;
+        border: 1px solid var(--border-color);
+      }
+      .scripts td {
+        padding: 2px 4px;
+        border: 1px solid #dedede;
+      }
+      .scripts tbody tr:nth-child(odd) {
+        background-color: #f9f9f9;
+      }
+      .scripts tbody tr:last-child td {
+        border-bottom: 1px solid var(--border-color);
+      }
+      .code {
+        margin: 0;
+      }
+      .date {
+        color: gray;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">Scripts</header>
+
+    <table class="scripts">
+      <thead>
+        <tr>
+          <th style="width: 200px">Origin</th>
+          <th>Code</th>
+          <th style="width: 100px">Created</th>
+          <th style="width: 100px">Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+
+    <template id="row-tpl">
+      <tr>
+        <td><a class="link origin" target="_blank"></a></td>
+        <td><pre class="code"></pre></td>
+        <td class="date created"></td>
+        <td class="date updated"></td>
+      </tr>
+    </template>
+
+    <script src="../libs/ace/ace.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

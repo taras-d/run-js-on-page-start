@@ -3,46 +3,35 @@
 <html>
   <head>
     <title>RunJsOnPageStart</title>
+    <link rel="stylesheet" href="../shared/styles.css">
     <style>
-      * {
-        box-sizing: border-box;
-      }
       body {
-        color: #333;
-        font-family: sans-serif;
-        font-size: 12px;
-        margin: 0;
-        padding: 0;
         width: 500px;
         height: 300px;
       }
       .header {
-        background-color: #f3f3f3;
-        border-bottom: 1px solid #d0d0d0;
-        height: 27px;
-        padding: 6px;
+        padding: 6px 4px;
         font-weight: bold;
-      }
-      .reload-page {
-        font-weight: normal;
-        color: #1155cc;
-        text-decoration: underline;
-        float: right;
-        cursor: pointer;
+        border-bottom: 1px solid var(--border-color);
       }
       .code {
         display: block;
         width: 100%;
-        height: calc(100% - 27px);
+        height: calc(100% - 54px);
+      }
+      .footer {
+        border-top: 1px solid var(--border-color);
       }
     </style>
   </head>
   <body>
-    <header class="header">
-      Run javascript code before page starts loading
-      <a class="reload-page">reload page</a>
-    </header>
+    <header class="panel header">Run javascript code before page starts loading</header>
     <div class="code"></div>
+    <div class="panel footer">
+      <button>Save</button>
+      <button data-reload>Save & reload</button>
+    </div>
+    
     <script src="../libs/ace/ace.js"></script>
     <script src="popup.js"></script>
   </body>
