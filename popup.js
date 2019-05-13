@@ -24,37 +24,22 @@ function executeScript(code) {
   });
 }
 
-function saveClick(event) {
-  const reload = event.target.getAttribute('reload') !== null;
-
+function saveChanges() {
   currentScript.code = editor.getValue();
-  currentScript.enabled = !!enabledEl.checked;
-
   saveScripts(allScripts).then(() => {
-    const code = (currentScript.enabled && currentScript.code) ?
+    const code = currentScript.code ?
       `localStorage['RunJsOnPageStart'] = ${JSON.stringify(currentScript.code)}` :
       `delete localStorage['RunJsOnPageStart']`;
     return executeScript(code);
-  }).then(() => {
-    window.close();
-    if (reload) {
-      chrome.tabs.reload();
-    }
   });
 }
-
-const codeEl = document.querySelector('.code');
-const enabledEl = document.querySelector('.footer input[type="checkbox"]');
-const btnEls = document.querySelectorAll('.footer button');
 
 let allScripts;
 let currentScript;
 let activeTab;
 
-btnEls.forEach(btn => btn.addEventListener('click', saveClick));
-
 // Init editor
-const editor = ace.edit(codeEl);
+const editor = ace.edit( document.querySelector('.code') );
 editor.setTheme('ace/theme/chrome');
 editor.setOptions({
   theme: 'ace/theme/chrome',
@@ -72,11 +57,12 @@ Promise.all([getScripts(), getActiveTab()]).then(res => {
 
   currentScript = allScripts.find(s => s.origin === origin);
   if (!currentScript) {
-    currentScript = { origin, code: '', enabled: true };
+    currentScript = { origin, code: '' };
     allScripts.push(currentScript);
   }
 
   editor.setValue(currentScript.code);
   editor.selection.cursor.setPosition(0);
-  enabledEl.checked = currentScript.enabled;
+
+  editor.on('change', saveChanges);
 });

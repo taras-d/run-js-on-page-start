@@ -8,61 +8,31 @@
         box-sizing: border-box;
       }
       body {
-        --panel-color: #f3f3f3;
-        --border-color: #d0d0d0;
-        --text-color: #333;
+        color: #333;
         font-family: sans-serif;
         font-size: 12px;
-        color: var(--text-color);
         margin: 0;
         padding: 0;
         width: 500px;
         height: 300px;
       }
-      .panel {
-        background-color: var(--panel-color);
-        padding: 4px 6px;
-      }
       .header {
+        background-color: #f3f3f3;
+        border-bottom: 1px solid #d0d0d0;
+        height: 27px;
         padding: 6px;
-        border-bottom: 1px solid var(--border-color);
         font-weight: bold;
       }
       .code {
         display: block;
         width: 100%;
-        height: calc(100% - 54px);
-        border-color: var(--border-color);
-        border-left: 0;
-        border-right: 0;
-      }
-      .footer {
-        text-align: right;
-        border-top: 1px solid var(--border-color);
-      }
-      .footer .enabled {
-        float: left;
-      }
-      .footer .enabled * {
-        vertical-align: middle;
-      }
-      .footer button {
-        color: inherit;
-        font-size: inherit;
-        font-family: inherit;
+        height: calc(100% - 27px);
       }
     </style>
   </head>
   <body>
     <header class="panel header">Run javascript code before page starts loading</header>
     <div class="code"></div>
-    <footer class="panel footer">
-      <label class="enabled">
-        <input type="checkbox"><span>enabled</span>
-      </label>
-      <button>Save</button>
-      <button reload>Save & reload</button>
-    </footer>
     <script src="ace/ace.js"></script>
     <script src="popup.js"></script>
   </body>
