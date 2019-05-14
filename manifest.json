@@ -8,17 +8,17 @@
     "storage"
   ],
   "icons": {
-    "16": "assets/imgs/js-16.png",
-    "48": "assets/imgs/js-48.png",
-    "128": "assets/imgs/js-128.png"
+    "16": "assets/imgs/script-16.png",
+    "48": "assets/imgs/script-48.png",
+    "128": "assets/imgs/script-128.png"
   },
   "browser_action": {
     "default_popup": "popup/popup.html",
     "default_title": "Run javascrip on page start",
     "default_icon": {
-      "16": "assets/imgs/js-16.png",
-      "24": "assets/imgs/js-24.png",
-      "32": "assets/imgs/js-32.png"
+      "16": "assets/imgs/script-16.png",
+      "24": "assets/imgs/script-24.png",
+      "32": "assets/imgs/script-32.png"
     }
   },
   "content_scripts": [{
