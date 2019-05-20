@@ -1,0 +1,24 @@
+body {
+  padding: 5px;
+}
+.table {
+  width: 800px;
+}
+.code {
+  padding: 0;
+  overflow: auto;
+  max-height: 250px;
+}
+.code pre {
+  margin: 0;
+}
+.date,
+.empty {
+  text-align: center;
+}
+.actions {
+  text-align: center;
+}
+.actions .link {
+  margin: 0 3px;
+}

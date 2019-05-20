@@ -2,23 +2,44 @@
   --panel-bg-color: #f3f3f3;
   --border-color: #d0d0d0;
   --link-color: #1155cc;
+  --text-color: #333;
 }
+
 * {
   box-sizing: border-box;
 }
+
 body {
   margin: 0;
   padding: 0;
-  color: #333;
+  color: var(--text-color);
   font-family: sans-serif;
   font-size: 12px;
 }
+
 .panel {
   background-color: var(--panel-bg-color);
   padding: 4px;
 }
+
 .link {
   color: var(--link-color);
   text-decoration: underline;
   cursor: pointer;
+}
+
+.table {
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.table thead th {
+  background-color: var(--panel-bg-color);
+  font-weight: bold;
+  text-align: center;
+}
+.table td,
+.table th {
+  border: 1px solid var(--border-color);
+  padding: 4px;
+  word-break: break-word;
 }

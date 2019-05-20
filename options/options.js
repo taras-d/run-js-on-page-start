@@ -1,45 +1,101 @@
-const tableBody = document.querySelector('.scripts tbody');
-const rowTpl = document.querySelector('#row-tpl');
-const emptyTpl = document.querySelector('#empty-tpl');
+const tableBody = $('.table tbody');
 
-function renderScripts(scripts) {
-  scripts = scripts || [];
-  tableBody.innerHTML = '';
-  
-  if (!scripts.length) {
-    tableBody.appendChild(
-      document.importNode(emptyTpl.content, true)
-    );
-    return;
-  }
-  
-  scripts.forEach(script => {
-    const row = document.importNode(rowTpl.content, true);
-    let el;
+let scripts;
 
-    el = row.querySelector('.origin a');
-    el.textContent = el.href = script.origin;
-
-    el = row.querySelector('.code pre');
-    el.textContent = script.code;
-
-    el = row.querySelector('.created');
-    el.textContent = new Date(script.createdAt).toLocaleString();
-
-    el = row.querySelector('.updated');
-    el.textContent = new Date(script.updatedAt).toLocaleString();
-    
-    el = row.querySelector('.delete');
-    el.addEventListener('click', () => {
-      if (confirm('Are you sure?')) {
-        scripts.splice(scripts.indexOf(script), 1);
-        chrome.storage.local.set({ scripts });
-      }
-    });
-
-    tableBody.appendChild(row);
-  });
+function scriptsLoaded(res) {
+  scripts = res || [];
+  renderScripts();
 }
 
-chrome.storage.local.get(['scripts'], data => renderScripts(data.scripts));
-chrome.storage.local.onChanged.addListener(data => renderScripts(data.scripts.newValue));
+function renderScripts() {
+  tableBody.empty();
+  if (scripts.length) {
+    scripts.forEach(script => {
+      tableBody.append(createTableRow(script));
+    })
+  } else {
+    tableBody.append(
+      $('<tr>').append(
+        $('<td>', {
+          text: 'no data',
+          class: 'empty',
+          attr: { colspan: 5 }
+        })
+      )
+    );
+  }
+}
+
+function formatDate(date) {
+  date = new Date(date);
+  return [
+    date.getDate(), '.', date.getMonth() + 1, '.', date.getFullYear(), ' ',
+    date.getHours(), ':', date.getMinutes(), ':', date.getMilliseconds()
+  ].map(part => {
+    if (typeof part === 'number') {
+      return part < 10 ? `0${part}` : `${part}`;
+    } else {
+      return part;
+    }
+  }).join('');
+}
+
+function createTableRow(script, index) {
+  return $('<tr>').append(
+    $('<td>').append(
+      $('<a>', {
+        class: 'link',
+        href: script.origin,
+        text: script.origin,
+        target: '_blank'
+      })
+    ),
+    $('<td>', {
+      class: 'code'
+    }).append(
+      $('<pre>', {
+        text: script.code
+      })
+    ),
+    $('<td>', {
+      class: 'date',
+      text: formatDate(script.createdAt)
+    }),
+    $('<td>', {
+      class: 'date',
+      text: formatDate(script.updatedAt)
+    }),
+    $('<td>', {
+      class: 'actions'
+    }).append(
+      $('<a>', {
+        class: 'link',
+        text: 'edit',
+        on: { click: () => editClick(script, index) }
+      }),
+      $('<a>', {
+        class: 'link',
+        text: 'delete',
+        on: { click: () => deleteClick(script, index) }
+      })
+    )
+  );
+}
+
+function editClick(script, index) {
+  console.log(script);
+}
+
+function deleteClick(script, index) {
+  if (confirm('Are you sure?')) {
+    scripts.splice(index, 1);
+    chrome.storage.local.set({ scripts });
+  }
+}
+
+chrome.storage.local.get(['scripts'], data => scriptsLoaded(data.scripts));
+chrome.storage.local.onChanged.addListener(data => {
+  if ('scripts' in data) {
+    scriptsLoaded(data.scripts.newValue)
+  }
+});
