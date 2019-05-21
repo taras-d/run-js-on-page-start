@@ -15,3 +15,17 @@ export const executeScript = toPromise(chrome.tabs, 'executeScript');
 export const reloadTab = toPromise(chrome.tabs, 'reload');
 export const createWindow = toPromise(chrome.windows, 'create');
 export const removeWindow = toPromise(chrome.windows, 'remove');
+
+export function formatDate(date) {
+  date = new Date(date);
+  return [
+    date.getDate(), '.', date.getMonth() + 1, '.', date.getFullYear(), ' ',
+    date.getHours(), ':', date.getMinutes()
+  ].map(part => {
+    if (typeof part === 'number') {
+      return part < 10 ? `0${part}` : `${part}`;
+    } else {
+      return part;
+    }
+  }).join('');
+}

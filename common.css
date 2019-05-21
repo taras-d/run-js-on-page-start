@@ -47,10 +47,18 @@ body {
 .dialog {
   border: 0;
   border-radius: 2px;
-  color: inherit;
-  padding: 15px;
   max-width: 300px;
   width: 100%;
+  color: inherit;
+  padding: 0;
+  box-shadow: 0 0 2px black;
+}
+.dialog::backdrop {
+  background-color: gray;
+  opacity: 0.3;
+}
+.dialog .dialog-box {
+  padding: 15px;
 }
 .dialog .dialog-header {
   padding-bottom: 6px;
