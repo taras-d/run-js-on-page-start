@@ -1,24 +1,36 @@
 body {
   padding: 5px;
 }
+
 .table {
-  width: 800px;
+  width: 900px;
 }
-.code {
+.table .code {
   padding: 0;
   overflow: auto;
   max-height: 250px;
 }
-.code pre {
+.table .code pre {
   margin: 0;
+  padding: 4px;
+  overflow: auto;
+  max-height: 250px;
 }
-.date,
-.empty {
+.table .date,
+.table .empty,
+.table .actions {
   text-align: center;
 }
-.actions {
-  text-align: center;
-}
-.actions .link {
+.table .actions .link {
   margin: 0 3px;
 }
+
+.dialog.loading {
+  max-width: 200px;
+  text-align: center;
+}
+
+.dialog.delete .buttons {
+  margin-top: 10px;
+  text-align: right;
+} 

@@ -7,10 +7,20 @@ import {
 } from '../util.js';
 
 let $tBody;
+let loadingDialog;
+let deleteDialog;
 let scripts;
 
 function init() {
   $tBody = $('.table tbody');
+
+  loadingDialog = createDialog({
+    selector: '.dialog.loading', closeEsc: false, closeBackdrop: false
+  });
+
+  deleteDialog = createDialog({
+    selector: '.dialog.delete'
+  });
 
   getFromLocalStorage(['scripts']).then(data => {
     scripts = data.scripts;
@@ -25,11 +35,44 @@ function init() {
   });
 }
 
+function createDialog(options) {
+  options = $.extend({
+    closeEsc: true, closeBackdrop: true
+  }, options);
+
+  const $el = $(options.selector);
+
+  $el.on('click', event => {
+    const target = $(event.target);
+    if (
+      target.closest('.dialog-close').length ||
+      (options.closeBackdrop && !target.closest('.dialog-box').length)
+    ) {
+      $el[0].close();
+    }
+  });
+
+  $el.on('cancel', event => {
+    if (!options.closeEsc) {
+      event.preventDefault();
+    }
+  });
+
+  return {
+    $el,
+    open: () => {
+      $('dialog[open]').each((index, el) => el.close());
+      $el[0].showModal();
+    },
+    close: () => $el[0].close()
+  };
+}
+
 function renderScripts() {
   $tBody.empty();
   if (scripts && scripts.length) {
-    scripts.forEach(script => {
-      $tBody.append(createTableRow(script));
+    scripts.forEach((script, index) => {
+      $tBody.append(createTableRow(script, index));
     })
   } else {
     $tBody.append(
@@ -105,19 +148,22 @@ function editClick(script, index) {
 }
 
 function deleteClick(script, index) {
-  if (!confirm(`Delete script for "${script.origin}"?`)) {
-    return;
-  }
-
-  let wnd;
-  createWindow({ url: script.origin, state: 'minimized' }).then(res => {
-    wnd = res;
-    return executeScript(wnd.tabs[0].id, { code: 'delete localStorage["RunJsOnPageStart"]' });
-  }).then(() => {
-    return removeWindow(wnd.id);
-  }).then(() => {
-    scripts.splice(index, 1);
-    return setToLocalStorage({ scripts });
+  deleteDialog.open();
+  deleteDialog.$el.find('.message').html(`Delete script <b>${script.origin}</b>?`);
+  deleteDialog.$el.find('button.yes').off('click').on('click', () => {
+    loadingDialog.open();
+    let wnd;
+    createWindow({ url: script.origin, state: 'minimized' }).then(res => {
+      wnd = res;
+      return executeScript(wnd.tabs[0].id, { code: 'delete localStorage["RunJsOnPageStart"]' });
+    }).then(() => {
+      return removeWindow(wnd.id);
+    }).then(() => {
+      scripts.splice(index, 1);
+      return setToLocalStorage({ scripts });
+    }).then(() => {
+      loadingDialog.close();
+    });
   });
 }
 

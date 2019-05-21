@@ -43,3 +43,23 @@ body {
   padding: 4px;
   word-break: break-word;
 }
+
+.dialog {
+  border: 0;
+  border-radius: 2px;
+  color: inherit;
+  padding: 15px;
+  max-width: 300px;
+  width: 100%;
+}
+.dialog .dialog-header {
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  min-height: 21px;
+}
+.dialog .dialog-header .dialog-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
