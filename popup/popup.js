@@ -1,77 +1,71 @@
-function getScripts() {
-  return new Promise(resolve => {
-    chrome.storage.local.get(['scripts'], data => {
-      resolve(data.scripts || []);
-    });
+import {
+  setToLocalStorage,
+  getFromLocalStorage,
+  getSelectedTab,
+  executeScript,
+  reloadTab
+} from '../util.js';
+
+let scripts;
+let currentScript;
+let selectedTab;
+let editor;
+
+function init() {
+  $('.footer button').on('click', saveClick);
+
+  initEditor();
+
+  Promise.all([
+    getFromLocalStorage(['scripts']),
+    getSelectedTab()
+  ]).then(res => {
+    scripts = res[0].scripts || [];
+    selectedTab = res[1];
+
+    const origin = new URL(selectedTab.url).origin;
+  
+    currentScript = scripts.find(s => s.origin === origin);
+    if (!currentScript) {
+      currentScript = { origin, code: '' };
+      scripts.unshift(currentScript);
+    }
+  
+    editor.setValue(currentScript.code);
+    editor.selection.cursor.setPosition(0);
   });
 }
 
-function saveScripts(scripts) {
-  return new Promise(resolve => {
-    chrome.storage.local.set({ scripts }, resolve);
+function initEditor() {
+  editor = ace.edit( $('.code')[0] );
+  editor.setTheme('ace/theme/chrome');
+  editor.setOptions({
+    theme: 'ace/theme/chrome',
+    mode: 'ace/mode/javascript',
+    fontSize: 11,
+    tabSize: 2,
+    useSoftTabs: true
   });
 }
 
-function getActiveTab() {
-  return new Promise(resolve => {
-    chrome.tabs.getSelected(resolve);
-  });
-}
-
-function executeScript(code) {
-  return new Promise(resolve => {
-    chrome.tabs.executeScript({ code }, resolve);
-  });
-}
-
-function saveChanges(reload) {
+function saveClick(event) {
   const date = new Date().toJSON();
   currentScript.createdAt = currentScript.createdAt || date;
   currentScript.updatedAt = date;
   currentScript.code = editor.getValue();
 
-  saveScripts(allScripts).then(() => {
+  setToLocalStorage({ scripts }).then(() => {
     const code = currentScript.code ?
       `localStorage['RunJsOnPageStart'] = ${JSON.stringify(currentScript.code)}` :
       `delete localStorage['RunJsOnPageStart']`;
-    return executeScript(code);
+    return executeScript({ code });
+  }).then(() => {
+    if ( $(event.target).hasClass('reload') ) {
+      return reloadTab();
+    }
   }).then(() => {
     window.close();
-    if (reload) {
-      chrome.tabs.reload();
-    }
   });
 }
 
-$('.footer button').on('click', event => saveChanges($(event.target).hasClass('reload')));
-
-let allScripts;
-let currentScript;
-let activeTab;
-
-// Init editor
-const editor = ace.edit( $('.code')[0] );
-editor.setTheme('ace/theme/chrome');
-editor.setOptions({
-  theme: 'ace/theme/chrome',
-  mode: 'ace/mode/javascript',
-  fontSize: 11,
-  tabSize: 2,
-  useSoftTabs: true
-});
-
-// Get scripts and active tab
-Promise.all([getScripts(), getActiveTab()]).then(res => {
-  [allScripts, activeTab] = res;
-
-  const origin = new URL(activeTab.url).origin;
-
-  currentScript = allScripts.find(s => s.origin === origin);
-  if (!currentScript) {
-    currentScript = { origin, code: '' };
-    allScripts.push(currentScript);
-  }
-
-  editor.setValue(currentScript.code);
-  editor.selection.cursor.setPosition(0);
-});
+init();
