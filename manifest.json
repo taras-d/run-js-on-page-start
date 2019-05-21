@@ -5,7 +5,10 @@
   "manifest_version": 2,
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "windows",
+    "http://*/",
+    "https://*/"
   ],
   "icons": {
     "16": "assets/imgs/script-16.png",
