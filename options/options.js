@@ -9,7 +9,7 @@ import {
 
 let $tBody;
 let loadingDialog;
-let confirmDialog;
+let infoDialog;
 let scripts;
 
 function init() {
@@ -37,15 +37,25 @@ function initDialogs() {
     closeByBackdrop: false
   });
 
-  confirmDialog = createDialog({
-    selector: '.dialog.confirm',
+  infoDialog = createDialog({
+    selector: '.dialog.info',
     init: ($el, dialog) => {
-      $el.find('button.yes').on('click', () => {
-        if (dialog.onConfirm) {
-          dialog.onConfirm();
-        }
-      });
-      dialog.setText = text => $el.find('.text').html(text)
+      dialog.setTitle = title => {
+        $el.find('.dialog-title').html(title).toggleClass('hidden', !title);
+      };
+      dialog.setText = text => {
+        $el.find('.dialog-body .text').html(text);
+      };
+      dialog.setButtons = items => {
+        const $btns = $el.find('.dialog-body .buttons').empty();
+        items.forEach(item => {
+          $('<button>', {
+            text: item.text,
+            on: { click: item.click },
+            class: 'dialog-close'
+          }).appendTo($btns);
+        });
+      };
     }
   });
 }
@@ -145,23 +155,36 @@ function editClick(script, index) {
 }
 
 function deleteClick(script, index) {
-  confirmDialog.open();
-  confirmDialog.setText(`Delete script from <b>${script.origin}</b>?`);
-  confirmDialog.onConfirm = () => {
-    loadingDialog.open();
-    createWindow({ url: script.origin, state: 'minimized' }).then(wnd => {
-      return executeScript(wnd.tabs[0].id, {
-        code: 'delete localStorage["RunJsOnPageStart"]'
-      }).then(() => wnd);
-    }).then(wnd => {
-      return removeWindow(wnd.id);
-    }).then(() => {
-      scripts.splice(index, 1);
-      return setToLocalStorage({ scripts });
-    }).then(() => {
-      loadingDialog.close();
-    });
-  };
+  infoDialog.setTitle('Confirm');
+  infoDialog.setText(`Delete script from <b>${script.origin}</b>?`);
+  infoDialog.setButtons([{
+    text: 'Yes',
+    click: () => deleteConfirmed(script, index)
+  }, {
+    text: 'No'
+  }]);
+  infoDialog.open();
+}
+
+function deleteConfirmed(script, index) {
+  loadingDialog.open();
+  let wnd;
+  createWindow({ url: script.origin, state: 'minimized' }).then(res => {
+    wnd = res;
+    return executeScript(wnd.tabs[0].id, { code: 'delete localStorage["RunJsOnPageStart"]' });
+  }).then(() => {
+    return removeWindow(wnd.id);
+  }).then(() => {
+    scripts.splice(index, 1);
+    return setToLocalStorage({ scripts });
+  }).then(() => {
+    loadingDialog.close();
+  }).catch(err => {
+    infoDialog.setTitle('Error');
+    infoDialog.setText(err.message);
+    infoDialog.setButtons([{ text: 'Ok' }]);
+    infoDialog.open();
+  });
 }
 
 init();

@@ -40,7 +40,7 @@ body {
 .table td,
 .table th {
   border: 1px solid var(--border-color);
-  padding: 4px;
+  padding: 5px;
   word-break: break-word;
 }
 
@@ -60,14 +60,21 @@ body {
 .dialog .dialog-box {
   padding: 15px;
 }
-.dialog .dialog-header {
+.dialog .dialog-title {
   padding-bottom: 6px;
   border-bottom: 1px solid var(--border-color);
   position: relative;
-  min-height: 21px;
+  min-height: 20px;
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 10px;
 }
-.dialog .dialog-header .dialog-close {
+.dialog .dialog-title .dialog-close {
   position: absolute;
   top: 0;
   right: 0;
+}
+
+.hidden {
+  display: none !important;
 }
