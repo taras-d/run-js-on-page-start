@@ -4,42 +4,18 @@
   <head>
     <title>RunJsOnPageStart</title>
     <link rel="stylesheet" href="../common.css">
-    <style>
-      body {
-        width: 500px;
-        height: 300px;
-      }
-      .header {
-        padding: 6px 4px;
-        font-weight: bold;
-        border-bottom: 1px solid var(--border-color);
-      }
-      .code {
-        display: block;
-        width: 100%;
-        height: calc(100% - 54px);
-      }
-      .footer {
-        border-top: 1px solid var(--border-color);
-      }
-      .footer button {
-        font-size: inherit;
-        font-family: inherit;
-        color: inherit;
-        padding: 0 7px;
-        height: 18px;
-      }
-    </style>
+    <link rel="stylesheet" href="popup.css">
   </head>
   <body>
     <header class="panel header">Run javascript code before page starts loading</header>
     <div class="code"></div>
     <div class="panel footer">
       <button title="Save to local storage">Save</button>
-      <button title="Save to local storage and reload page" data-reload>Save & reload</button>
+      <button title="Save to local storage and reload page" class="reload">Save & reload</button>
     </div>
 
     <script src="../lib/ace/ace.js"></script>
+    <script src="../lib/jquery/jquery.min.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

@@ -24,7 +24,7 @@ function executeScript(code) {
   });
 }
 
-function saveChanges(event) {
+function saveChanges(reload) {
   const date = new Date().toJSON();
   currentScript.createdAt = currentScript.createdAt || date;
   currentScript.updatedAt = date;
@@ -37,22 +37,20 @@ function saveChanges(event) {
     return executeScript(code);
   }).then(() => {
     window.close();
-    if (event.target.dataset.reload === '') {
+    if (reload) {
       chrome.tabs.reload();
     }
   });
 }
 
-document.querySelectorAll('.footer button').forEach(
-  btn => btn.addEventListener('click', saveChanges)
-);
+$('.footer button').on('click', event => saveChanges($(event.target).hasClass('reload')));
 
 let allScripts;
 let currentScript;
 let activeTab;
 
 // Init editor
-const editor = ace.edit( document.querySelector('.code') );
+const editor = ace.edit( $('.code')[0] );
 editor.setTheme('ace/theme/chrome');
 editor.setOptions({
   theme: 'ace/theme/chrome',
