@@ -7,28 +7,32 @@ import {
   formatDate
 } from '../util.js';
 
-let $tBody;
+let $headerButtons;
+let $tableBody;
 let loadingDialog;
 let infoDialog;
 let editDialog;
 let scripts;
 
 function init() {
-  $tBody = $('.table tbody');
+  $headerButtons = $('.main-header .buttons button').on('click', headerButtonClick);
+  $tableBody = $('.table tbody');
 
   initDialogs();
 
-  getFromLocalStorage(['scripts']).then(data => {
-    scripts = data.scripts;
-    renderScripts();
-  });
+  getFromLocalStorage(['scripts']).then(data => scriptsLoaded(data.scripts));
 
   chrome.storage.local.onChanged.addListener(data => {
     if ('scripts' in data) {
-      scripts = data.scripts.newValue;
-      renderScripts();
+      scriptsLoaded(data.scripts.newValue);
     }
   });
+}
+
+function scriptsLoaded(res) {
+  scripts = res || [];
+  renderScripts();
+  $headerButtons.filter('.export').get(0).disabled = !scripts.length;
 }
 
 function initDialogs() {
@@ -112,13 +116,13 @@ function createDialog(options) {
 }
 
 function renderScripts() {
-  $tBody.empty();
-  if (scripts && scripts.length) {
+  $tableBody.empty();
+  if (scripts.length) {
     scripts.forEach((script, index) => {
-      $tBody.append(createTableRow(script, index));
+      $tableBody.append(createTableRow(script, index));
     })
   } else {
-    $tBody.append(
+    $tableBody.append(
       $('<tr>').append(
         $('<td>', {
           text: 'no data', class: 'empty',
@@ -235,6 +239,32 @@ function deleteConfirm(script, index) {
       text: err.message,
       buttons: [{ text: 'Ok' }]
     });
+  });
+}
+
+function headerButtonClick(event) {
+  const $btn = $(event.target);
+  if ($btn.hasClass('export')) {
+    exportJson();
+  } else if ($btn.hasClass('import')) {
+    importJson();
+  }
+}
+
+function exportJson() {
+  const blob = new Blob([ JSON.stringify(scripts, null, 2) ]);
+  const $link = $('<a>', {
+    href: URL.createObjectURL(blob), download: 'scripts.json'
+  });
+  $link.get(0).click();
+  URL.revokeObjectURL($link.attr('href'));
+}
+
+function importJson() {
+  const $input = $('<input>', {
+    type: 'file', accept: '.json'
+  }).click().on('change', () => {
+    console.log($input.prop('files'));
   });
 }
 

@@ -1,15 +1,22 @@
-body {
+.app {
+  max-width: 900px;
   padding: 8px;
 }
 
-.header {
+.main-header {
+  position: relative;
   font-size: 13px;
   font-weight: bold;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
+}
+.main-header .buttons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 11px;
 }
 
 .table {
-  max-width: 900px;
   width: 100%;
 }
 .table .code {
@@ -35,7 +42,6 @@ body {
 .dialog.loading {
   max-width: 200px;
   text-align: center;
-  font-weight: bold;
 }
 
 .dialog.info .buttons {
