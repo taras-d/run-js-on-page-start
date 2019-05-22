@@ -10,6 +10,7 @@ import {
 let $tBody;
 let loadingDialog;
 let infoDialog;
+let editDialog;
 let scripts;
 
 function init() {
@@ -32,37 +33,54 @@ function init() {
 
 function initDialogs() {
   loadingDialog = createDialog({
-    selector: '.dialog.loading',
-    closeByEsc: false,
-    closeByBackdrop: false
+    selector: '.dialog.loading', closeBy: ''
   });
 
   infoDialog = createDialog({
     selector: '.dialog.info',
-    init: ($el, dialog) => {
-      dialog.setTitle = title => {
-        $el.find('.dialog-title').html(title).toggleClass('hidden', !title);
-      };
-      dialog.setText = text => {
-        $el.find('.dialog-body .text').html(text);
-      };
-      dialog.setButtons = items => {
-        const $btns = $el.find('.dialog-body .buttons').empty();
-        items.forEach(item => {
-          $('<button>', {
-            text: item.text,
-            on: { click: item.click },
-            class: 'dialog-close'
-          }).appendTo($btns);
+    beforeOpen: ($el, config) => {
+      $el.find('.dialog-title').html(config.title).toggleClass('hidden', !config.title);
+      $el.find('.dialog-body .text').html(config.text);
+      const $buttons = $el.find('.dialog-body .buttons').empty();
+      config.buttons.forEach(btn => {
+        $('<button>', {
+          text: btn.text,
+          on: { click: btn.click },
+          class: 'dialog-close'
+        }).appendTo($buttons);
+      });
+    }
+  });
+
+  editDialog = createDialog({
+    selector: '.dialog.edit',
+    beforeOpen: ($el, config) => {
+      $el.find('.origin').val(config.script.origin);
+      $el.find('.save').off('click').on('click', config.save);
+
+      let editor = editDialog.editor;
+      if (!editor) {
+        editor = editDialog.editor = ace.edit( $el.find('.code').get(0) );
+        editor.setTheme('ace/theme/chrome');
+        editor.setOptions({
+          theme: 'ace/theme/chrome',
+          mode: 'ace/mode/javascript',
+          fontSize: 11,
+          tabSize: 2,
+          useSoftTabs: true
         });
-      };
+      }
+
+      editor.setValue(config.script.code);
+      editor.selection.cursor.setPosition(0);
     }
   });
 }
 
 function createDialog(options) {
   options = $.extend({
-    closeByEsc: true, closeByBackdrop: true, init: $.noop
+    closeBy: 'esc,backdrop',
+    closeByEsc: true, closeByBackdrop: true, beforeOpen: $.noop
   }, options);
 
   const $el = $(options.selector);
@@ -70,26 +88,25 @@ function createDialog(options) {
     const $target = $(event.target);
     if (
       $target.closest('.dialog-close').length ||
-      (options.closeByBackdrop && !$target.closest('.dialog-box').length)
+      (options.closeBy.includes('backdrop') && !$target.closest('.dialog-box').length)
     ) {
       $el.get(0).close();
     }
   });
   $el.on('cancel', event => {
-    if (!options.closeByEsc) {
+    if (!options.closeBy.includes('esc')) {
       event.preventDefault();
     }
   });
 
   const dialog = {
-    open: () => {
+    open: config => {
+      options.beforeOpen($el, config);
       $('dialog[open]').each((index, el) => el.close());
       $el.get(0).showModal();
     },
     close: () => $el.get(0).close()
   };
-
-  options.init($el, dialog);
 
   return dialog;
 }
@@ -150,28 +167,61 @@ function createTableRow(script, index) {
   );
 }
 
-function editClick(script, index) {
-  console.log(script);
+function editClick(script) {
+  editDialog.open({
+    script,
+    save: () => saveClick(script)
+  });
+}
+
+function saveClick(script) {
+  script.code = editDialog.editor.getValue();
+  script.updatedAt = new Date().toJSON();
+
+  loadingDialog.open();
+
+  let wnd;
+  createWindow({ url: script.origin, state: 'minimized' }).then(res => {
+    wnd = res;
+    return executeScript(wnd.tabs[0].id, {
+      code: `localStorage['RunJsOnPageStart'] = ${JSON.stringify(script.code)}`
+    });
+  }).then(() => {
+    return removeWindow(wnd.id);
+  }).then(() => {
+    return setToLocalStorage({ scripts });
+  }).then(() => {
+    loadingDialog.close();
+  }).catch(err => {
+    infoDialog.open({
+      title: 'Error',
+      text: err.message,
+      buttons: [{ text: 'Ok' }]
+    });
+  });
 }
 
 function deleteClick(script, index) {
-  infoDialog.setTitle('Confirm');
-  infoDialog.setText(`Delete script from <b>${script.origin}</b>?`);
-  infoDialog.setButtons([{
-    text: 'Yes',
-    click: () => deleteConfirmed(script, index)
-  }, {
-    text: 'No'
-  }]);
-  infoDialog.open();
+  infoDialog.open({
+    title: 'Confirm',
+    text: `Delete script from <b>${script.origin}</b>?`,
+    buttons: [{
+      text: 'Yes',
+      click: () => deleteConfirm(script, index)
+    }, {
+      text: 'No'
+    }]
+  });
 }
 
-function deleteConfirmed(script, index) {
+function deleteConfirm(script, index) {
   loadingDialog.open();
   let wnd;
   createWindow({ url: script.origin, state: 'minimized' }).then(res => {
     wnd = res;
-    return executeScript(wnd.tabs[0].id, { code: 'delete localStorage["RunJsOnPageStart"]' });
+    return executeScript(wnd.tabs[0].id, {
+      code: `delete localStorage['RunJsOnPageStart']`
+    });
   }).then(() => {
     return removeWindow(wnd.id);
   }).then(() => {
@@ -180,10 +230,11 @@ function deleteConfirmed(script, index) {
   }).then(() => {
     loadingDialog.close();
   }).catch(err => {
-    infoDialog.setTitle('Error');
-    infoDialog.setText(err.message);
-    infoDialog.setButtons([{ text: 'Ok' }]);
-    infoDialog.open();
+    infoDialog.open({
+      title: 'Error',
+      text: err.message,
+      buttons: [{ text: 'Ok' }]
+    });
   });
 }
 

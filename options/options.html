@@ -34,12 +34,40 @@
       </div>
     </dialog>
 
+    <dialog class="dialog edit">
+      <div class="dialog-box">
+        <div class="dialog-title">
+          Edit script <a class="dialog-close link">close</a>
+        </div>
+        <div class="dialog-body">
+          <div class="form">
+            <div class="form-row">
+              <div class="input-label">Origin</div>
+              <div class="input-control">
+                <input disabled class="input origin">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="input-label">Code</div>
+              <div class="input-control">
+                <div class="code"></div>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="dialog-close save">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
     <dialog class="dialog loading">
       <div class="dialog-box">
         <div class="dialog-body">Please wait...</div>
       </div>
     </dialog>
 
+    <script src="../lib/ace/ace.js"></script>
     <script src="../lib/jquery/jquery.min.js"></script>
     <script src="options.js" type="module"></script>
   </body>

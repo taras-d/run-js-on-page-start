@@ -45,3 +45,18 @@ body {
 .dialog.info .buttons button {
   margin-left: 6px;
 }
+
+.dialog.edit {
+  max-width: 500px;
+}
+.dialog.edit .origin {
+  max-width: 300px;
+  width: 100%;
+}
+.dialog.edit .code {
+  height: 300px;
+  border: 1px solid var(--border-color);
+}
+.dialog.edit .actions {
+  text-align: center;
+}

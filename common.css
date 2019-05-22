@@ -17,17 +17,20 @@ body {
   font-size: 12px;
 }
 
+/* Panel */
 .panel {
   background-color: var(--panel-bg-color);
   padding: 4px;
 }
 
+/* Link */
 .link {
   color: var(--link-color);
   text-decoration: underline;
   cursor: pointer;
 }
 
+/* Table */
 .table {
   border-collapse: collapse;
   table-layout: fixed;
@@ -44,6 +47,7 @@ body {
   word-break: break-word;
 }
 
+/* Dialog */
 .dialog {
   border: 0;
   border-radius: 2px;
@@ -71,8 +75,40 @@ body {
 }
 .dialog .dialog-title .dialog-close {
   position: absolute;
-  top: 0;
+  top: -3px;
   right: 0;
+  font-weight: normal;
+  font-size: 12px;
+}
+
+/* Form */
+.form {
+
+}
+.form .form-row {
+  display: flex;
+  align-items: center;
+}
+.form .form-row {
+  margin-bottom: 10px;
+}
+.form .input-label {
+  width: 60px;
+  text-align: right;
+  padding-right: 15px;
+}
+.form .input-control {
+  flex: 1;
+}
+
+/* Input */
+.input {
+  border: 1px solid var(--border-color);
+  padding: 2px 4px;
+}
+.input[disabled] {
+  pointer-events: none;
+  background-color: var(--panel-bg-color);
 }
 
 .hidden {
