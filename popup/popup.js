@@ -13,6 +13,7 @@ let editor;
 
 function init() {
   $('.footer button').on('click', saveClick);
+  $('.footer .manage-scripts').on('click', manageScriptsClick);
 
   initEditor();
 
@@ -37,7 +38,7 @@ function init() {
 }
 
 function initEditor() {
-  editor = ace.edit( $('.code')[0] );
+  editor = ace.edit( $('.code').get(0) );
   editor.setTheme('ace/theme/chrome');
   editor.setOptions({
     theme: 'ace/theme/chrome',
@@ -66,6 +67,10 @@ function saveClick(event) {
   }).then(() => {
     window.close();
   });
+}
+
+function manageScriptsClick() {
+  chrome.runtime.openOptionsPage();
 }
 
 init();

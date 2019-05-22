@@ -22,3 +22,6 @@ body {
   padding: 0 7px;
   height: 18px;
 }
+.footer .manage-scripts {
+  float: right;
+}
