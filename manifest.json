@@ -1,7 +1,7 @@
 {
   "name": "RunJsOnPageStart",
   "description": "Run javascript code before page starts loading",
-  "version": "1.0.13",
+  "version": "1.0.15",
   "manifest_version": 2,
   "permissions": [
     "activeTab",
