@@ -8,7 +8,8 @@
     "storage",
     "windows",
     "http://*/",
-    "https://*/"
+    "https://*/",
+    "file://*/"
   ],
   "icons": {
     "16": "assets/imgs/script-16.png",

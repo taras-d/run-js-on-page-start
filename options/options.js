@@ -207,7 +207,7 @@ function saveClick(script) {
 function deleteClick(script, index) {
   infoDialog.open({
     title: 'Confirm',
-    text: `Delete script from <b>${script.origin}</b>?`,
+    text: `Delete script from origin <b>${script.origin}</b>?`,
     buttons: [{
       text: 'Yes',
       click: () => deleteConfirm(script, index)
