@@ -4,7 +4,8 @@ import {
   createWindow,
   removeWindow,
   executeScript,
-  formatDate
+  formatDate,
+  readJsonFile
 } from '../util.js';
 
 let $headerButtons;
@@ -198,9 +199,7 @@ function saveClick(script) {
     loadingDialog.close();
   }).catch(err => {
     infoDialog.open({
-      title: 'Error',
-      text: err.message,
-      buttons: [{ text: 'Ok' }]
+      title: 'Error', text: err.message, buttons: [{ text: 'Ok' }]
     });
   });
 }
@@ -235,9 +234,7 @@ function deleteConfirm(script, index) {
     loadingDialog.close();
   }).catch(err => {
     infoDialog.open({
-      title: 'Error',
-      text: err.message,
-      buttons: [{ text: 'Ok' }]
+      title: 'Error', text: err.message, buttons: [{ text: 'Ok' }]
     });
   });
 }
@@ -252,19 +249,38 @@ function headerButtonClick(event) {
 }
 
 function exportJson() {
-  const blob = new Blob([ JSON.stringify(scripts, null, 2) ]);
-  const $link = $('<a>', {
-    href: URL.createObjectURL(blob), download: 'scripts.json'
+  const $el = $('<a>', {
+    download: 'scripts.json',
+    href: URL.createObjectURL( new Blob([JSON.stringify(scripts, null, 2)]) )
   });
-  $link.get(0).click();
-  URL.revokeObjectURL($link.attr('href'));
+  $el.get(0).click();
+  URL.revokeObjectURL($el.attr('href'));
 }
 
 function importJson() {
-  const $input = $('<input>', {
+  const $el = $('<input>', {
     type: 'file', accept: '.json'
   }).click().on('change', () => {
-    console.log($input.prop('files'));
+    loadingDialog.open();
+    const file = $el.get(0).files[0];
+    readJsonFile(file).then(data => {
+      data.forEach(item => {
+        const script = scripts.find(s => s.origin.toLowerCase() === item.origin.toLowerCase());
+        if (script) {
+          Object.assign(script, item);
+        } else {
+          scripts.push(item);
+        }
+      });
+    }).then(() => {
+      return setToLocalStorage({ scripts })
+    }).then(() => {
+      loadingDialog.close();
+    }).catch(err => {
+      infoDialog.open({
+        title: 'Error', text: err.message, buttons: [{ text: 'Ok' }]
+      });
+    });
   });
 }
 

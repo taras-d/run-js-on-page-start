@@ -29,3 +29,18 @@ export function formatDate(date) {
     }
   }).join('');
 }
+
+export function readJsonFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      try {
+        resolve( JSON.parse(reader.result) );
+      } catch (err) {
+        reject(err);
+      }
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(file);
+  });
+}
