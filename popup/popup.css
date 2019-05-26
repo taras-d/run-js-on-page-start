@@ -24,4 +24,5 @@ body {
 }
 .footer .manage-scripts {
   float: right;
+  padding-top: 1px;
 }
