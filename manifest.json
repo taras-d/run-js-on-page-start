@@ -30,5 +30,9 @@
     "js": ["content.js"],
     "run_at": "document_start"
   }],
-  "options_page": "options/options.html"
+  "options_page": "options/options.html",
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  }
 }
