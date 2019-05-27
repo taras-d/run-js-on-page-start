@@ -3,7 +3,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     return;
   }
 
-  if (/^(file|http|https):\/\//i.test(changeInfo.url)) {
+  if (/^(ftp|file|http|https):\/\//i.test(changeInfo.url)) {
     chrome.browserAction.enable(tabId);
   } else {
     chrome.browserAction.disable(tabId);
