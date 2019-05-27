@@ -5,13 +5,14 @@ import {
   removeWindow,
   executeScript,
   formatDate,
-  readJsonFile
+  readJsonFile,
+  createDialog,
+  infoDialog
 } from '../util.js';
 
 let $headerButtons;
 let $tableBody;
 let loadingDialog;
-let infoDialog;
 let editDialog;
 let scripts;
 
@@ -41,22 +42,6 @@ function initDialogs() {
     selector: '.dialog.loading', closeBy: ''
   });
 
-  infoDialog = createDialog({
-    selector: '.dialog.info',
-    beforeOpen: ($el, config) => {
-      $el.find('.dialog-title').html(config.title).toggleClass('hidden', !config.title);
-      $el.find('.dialog-body .text').html(config.text);
-      const $buttons = $el.find('.dialog-body .buttons').empty();
-      config.buttons.forEach(btn => {
-        $('<button>', {
-          text: btn.text,
-          on: { click: btn.click },
-          class: 'dialog-close'
-        }).appendTo($buttons);
-      });
-    }
-  });
-
   editDialog = createDialog({
     selector: '.dialog.edit',
     beforeOpen: ($el, config) => {
@@ -80,40 +65,6 @@ function initDialogs() {
       editor.selection.cursor.setPosition(0);
     }
   });
-}
-
-function createDialog(options) {
-  options = $.extend({
-    closeBy: 'esc,backdrop',
-    closeByEsc: true, closeByBackdrop: true, beforeOpen: $.noop
-  }, options);
-
-  const $el = $(options.selector);
-  $el.on('click', event => {
-    const $target = $(event.target);
-    if (
-      $target.closest('.dialog-close').length ||
-      (options.closeBy.includes('backdrop') && !$target.closest('.dialog-box').length)
-    ) {
-      $el.get(0).close();
-    }
-  });
-  $el.on('cancel', event => {
-    if (!options.closeBy.includes('esc')) {
-      event.preventDefault();
-    }
-  });
-
-  const dialog = {
-    open: config => {
-      options.beforeOpen($el, config);
-      $('dialog[open]').each((index, el) => el.close());
-      $el.get(0).showModal();
-    },
-    close: () => $el.get(0).close()
-  };
-
-  return dialog;
 }
 
 function renderScripts() {

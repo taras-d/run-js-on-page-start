@@ -81,6 +81,15 @@ body {
   font-size: 12px;
 }
 
+/* Info dialog */
+.dialog.info .buttons {
+  margin-top: 10px;
+  text-align: right;
+} 
+.dialog.info .buttons button {
+  margin-left: 6px;
+}
+
 /* Form */
 .form {
 

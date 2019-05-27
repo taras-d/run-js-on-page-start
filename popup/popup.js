@@ -3,7 +3,8 @@ import {
   getFromLocalStorage,
   getSelectedTab,
   executeScript,
-  reloadTab
+  reloadTab,
+  infoDialog
 } from '../util.js';
 
 let scripts;
@@ -55,17 +56,22 @@ function saveClick(event) {
   currentScript.updatedAt = date;
   currentScript.code = editor.getValue();
 
-  setToLocalStorage({ scripts }).then(() => {
-    const code = currentScript.code ?
-      `localStorage['RunJsOnPageStart'] = ${JSON.stringify(currentScript.code)}` :
-      `delete localStorage['RunJsOnPageStart']`;
-    return executeScript({ code });
+  const code = currentScript.code ?
+    `localStorage['RunJsOnPageStart'] = ${JSON.stringify(currentScript.code)}` :
+    `delete localStorage['RunJsOnPageStart']`;
+  
+  executeScript({ code }).then(() => {
+    return setToLocalStorage({ scripts });
   }).then(() => {
     if ( $(event.target).hasClass('reload') ) {
       return reloadTab();
     }
   }).then(() => {
     window.close();
+  }).catch(err => {
+    infoDialog.open({
+      title: 'Error', text: err.message, buttons: [{ text: 'Ok' }]
+    });
   });
 }
 

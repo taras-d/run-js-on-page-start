@@ -44,14 +44,6 @@
   text-align: center;
 }
 
-.dialog.info .buttons {
-  margin-top: 10px;
-  text-align: right;
-} 
-.dialog.info .buttons button {
-  margin-left: 6px;
-}
-
 .dialog.edit {
   max-width: 500px;
 }
