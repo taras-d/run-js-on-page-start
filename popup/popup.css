@@ -1,6 +1,5 @@
 body {
   width: 500px;
-  height: 300px;
 }
 .header {
   padding: 6px 4px;
@@ -10,7 +9,7 @@ body {
 .code {
   display: block;
   width: 100%;
-  height: calc(100% - 54px);
+  height: 240px;
 }
 .footer {
   border-top: 1px solid var(--border-color);
