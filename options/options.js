@@ -89,16 +89,16 @@ function createScriptItem(script, index) {
         })
       ),
       $('<div>', { class: 'actions' }).append(
-        // $('<a>', {
-        //   class: 'link', text: 'copy to cp',
-        //   on: { click: () => copyToClipboardClick(script, index) }
-        // }),
         $('<a>', {
-          class: 'link', text: 'edit',
-          on: { click: () => editClick(script, index) }
+          class: 'link', text: 'copy to cp', title: 'Copy script to clipboard',
+          on: { click: event => copyToClipboardClick(event) }
         }),
         $('<a>', {
-          class: 'link', text: 'delete',
+          class: 'link', text: 'edit', title: 'Edit script',
+          on: { click: () => editClick(script) }
+        }),
+        $('<a>', {
+          class: 'link', text: 'delete', title: 'Delete script',
           on: { click: () => deleteClick(script, index) }
         })
       )
@@ -109,8 +109,11 @@ function createScriptItem(script, index) {
   );
 }
 
-function copyToClipboardClick(script, index) {
-  // copy to clipboard
+function copyToClipboardClick(event) {
+  const el = $(event.target).closest('.script').find('.code').get(0);
+  window.getSelection().selectAllChildren(el);
+  document.execCommand('copy');
+  window.getSelection().removeAllRanges();
 }
 
 function editClick(script) {
