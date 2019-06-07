@@ -30,23 +30,6 @@ body {
   cursor: pointer;
 }
 
-/* Table */
-.table {
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-.table thead th {
-  background-color: var(--panel-bg-color);
-  font-weight: bold;
-  text-align: center;
-}
-.table td,
-.table th {
-  border: 1px solid var(--border-color);
-  padding: 5px;
-  word-break: break-word;
-}
-
 /* Dialog */
 .dialog {
   border: 0;

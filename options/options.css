@@ -1,5 +1,5 @@
 .app {
-  max-width: 900px;
+  max-width: 600px;
   padding: 8px;
 }
 
@@ -16,27 +16,34 @@
   font-size: 11px;
 }
 
-.table {
-  width: 100%;
+.script {
+  border: 1px solid var(--border-color);
+  margin-bottom: 10px;
 }
-.table .code {
-  padding: 0;
-  overflow: auto;
-  max-height: 250px;
+.script .panel {
+  display: flex;
 }
-.table .code pre {
-  margin: 0;
+.script .origin {
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.script .actions {
+  text-align: right;
+}
+.script .actions .link {
+  margin-left: 8px;
+}
+.script .code {
+  white-space: pre;
   padding: 4px;
+  max-height: 150px;
   overflow: auto;
-  max-height: 250px;
 }
-.table .date,
-.table .empty,
-.table .actions {
+.scripts .empty {
   text-align: center;
-}
-.table .actions .link {
-  margin: 0 3px;
+  color: gray;
 }
 
 .dialog.loading {

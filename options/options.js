@@ -11,14 +11,14 @@ import {
 } from '../util.js';
 
 let $headerButtons;
-let $tableBody;
+let $scriptsList;
 let loadingDialog;
 let editDialog;
 let scripts;
 
 function init() {
   $headerButtons = $('.main-header .buttons button').on('click', headerButtonClick);
-  $tableBody = $('.table tbody');
+  $scriptsList = $('.scripts');
 
   initDialogs();
 
@@ -68,59 +68,49 @@ function initDialogs() {
 }
 
 function renderScripts() {
-  $tableBody.empty();
+  $scriptsList.empty();
   if (scripts.length) {
-    scripts.forEach((script, index) => {
-      $tableBody.append(createTableRow(script, index));
-    })
+    $scriptsList.append( ...scripts.map(createScriptItem) );
   } else {
-    $tableBody.append(
-      $('<tr>').append(
-        $('<td>', {
-          text: 'no data', class: 'empty',
-          attr: { colspan: 5 }
-        })
-      )
-    );
+    $scriptsList.append( $('<div>', { class: 'empty', text: 'no data' }) );
   }
 }
 
-function createTableRow(script, index) {
-  return $('<tr>').append(
-    $('<td>').append(
-      $('<a>', {
-        text: script.origin, class: 'link',
-        href: script.origin, target: '_blank'
-      })
+function createScriptItem(script, index) {
+  const title = `Created - ${formatDate(script.createdAt)}, Updated - ${formatDate(script.updatedAt)}`;
+  return $('<div>', {
+    class: 'script'
+  }).append(
+    $('<div>', { class: 'panel' }).append(
+      $('<div>', { class: 'origin' }).append(
+        $('<a>', {
+          text: script.origin, class: 'link', title,
+          href: script.origin, target: '_blank'
+        })
+      ),
+      $('<div>', { class: 'actions' }).append(
+        // $('<a>', {
+        //   class: 'link', text: 'copy to cp',
+        //   on: { click: () => copyToClipboardClick(script, index) }
+        // }),
+        $('<a>', {
+          class: 'link', text: 'edit',
+          on: { click: () => editClick(script, index) }
+        }),
+        $('<a>', {
+          class: 'link', text: 'delete',
+          on: { click: () => deleteClick(script, index) }
+        })
+      )
     ),
-    $('<td>', {
-      class: 'code'
-    }).append(
-      $('<pre>', {
-        text: script.code
-      })
-    ),
-    $('<td>', {
-      class: 'date',
-      text: formatDate(script.createdAt)
-    }),
-    $('<td>', {
-      class: 'date',
-      text: formatDate(script.updatedAt)
-    }),
-    $('<td>', {
-      class: 'actions'
-    }).append(
-      $('<a>', {
-        class: 'link', text: 'edit',
-        on: { click: () => editClick(script, index) }
-      }),
-      $('<a>', {
-        class: 'link', text: 'delete',
-        on: { click: () => deleteClick(script, index) }
-      })
-    )
+    $('<div>', {
+      class: 'code', text: script.code
+    })
   );
+}
+
+function copyToClipboardClick(script, index) {
+  // copy to clipboard
 }
 
 function editClick(script) {
