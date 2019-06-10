@@ -40,7 +40,6 @@ function init() {
 
 function initEditor() {
   editor = ace.edit( $('.code').get(0) );
-  editor.setTheme('ace/theme/chrome');
   editor.setOptions({
     theme: 'ace/theme/chrome',
     mode: 'ace/mode/javascript',

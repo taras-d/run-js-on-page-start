@@ -1,5 +1,5 @@
 .app {
-  max-width: 600px;
+  max-width: 650px;
   padding: 8px;
 }
 
@@ -37,12 +37,6 @@
 }
 .script .actions .link {
   margin-left: 8px;
-}
-.script .code {
-  white-space: pre;
-  padding: 4px;
-  max-height: 150px;
-  overflow: auto;
 }
 .scripts .empty {
   text-align: center;

@@ -14,7 +14,8 @@ let $headerButtons;
 let $scriptsList;
 let loadingDialog;
 let editDialog;
-let scripts;
+let scripts = [];
+let scriptsEditors = [];
 
 function init() {
   $headerButtons = $('.main-header .buttons button').on('click', headerButtonClick);
@@ -51,7 +52,6 @@ function initDialogs() {
       let editor = editDialog.editor;
       if (!editor) {
         editor = editDialog.editor = ace.edit( $el.find('.code').get(0) );
-        editor.setTheme('ace/theme/chrome');
         editor.setOptions({
           theme: 'ace/theme/chrome',
           mode: 'ace/mode/javascript',
@@ -68,7 +68,11 @@ function initDialogs() {
 }
 
 function renderScripts() {
+  scriptsEditors.forEach(e => e.destroy());
+  scriptsEditors = [];
+
   $scriptsList.empty();
+
   if (scripts.length) {
     $scriptsList.append( ...scripts.map(createScriptItem) );
   } else {
@@ -78,6 +82,26 @@ function renderScripts() {
 
 function createScriptItem(script, index) {
   const title = `Created - ${formatDate(script.createdAt)}, Updated - ${formatDate(script.updatedAt)}`;
+
+  const $code = $('<div>', { class: 'code' });
+  const editor = ace.edit( $code.get(0) );
+  editor.setOptions({
+    theme: 'ace/theme/chrome',
+    mode: 'ace/mode/javascript',
+    fontSize: 11,
+    tabSize: 2,
+    useSoftTabs: true,
+    minLines: 1,
+    maxLines: 10,
+    readOnly: true,
+    highlightActiveLine: false,
+    highlightGutterLine: false
+  });
+  $(editor.renderer.$cursorLayer.element).hide();
+  editor.setValue(script.code);
+  editor.selection.clearSelection();
+  scriptsEditors.push(editor);
+
   return $('<div>', {
     class: 'script'
   }).append(
@@ -91,7 +115,7 @@ function createScriptItem(script, index) {
       $('<div>', { class: 'actions' }).append(
         $('<a>', {
           class: 'link', text: 'copy to cp', title: 'Copy script to clipboard',
-          on: { click: event => copyToClipboardClick(event) }
+          on: { click: () => copyToClipboardClick(index) }
         }),
         $('<a>', {
           class: 'link', text: 'edit', title: 'Edit script',
@@ -103,17 +127,16 @@ function createScriptItem(script, index) {
         })
       )
     ),
-    $('<div>', {
-      class: 'code', text: script.code
-    })
+    $code
   );
 }
 
-function copyToClipboardClick(event) {
-  const el = $(event.target).closest('.script').find('.code').get(0);
-  window.getSelection().selectAllChildren(el);
+function copyToClipboardClick(index) {
+  const editor = scriptsEditors[index];
+  editor.selectAll();
+  editor.focus();
   document.execCommand('copy');
-  window.getSelection().removeAllRanges();
+  editor.selection.clearSelection();
 }
 
 function editClick(script) {
