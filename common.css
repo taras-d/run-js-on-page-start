@@ -102,7 +102,7 @@ body.dialog-open {
   padding: 2px 4px;
 }
 .input[disabled] {
-  pointer-events: none;
+  cursor: not-allowed;
   background-color: var(--panel-bg-color);
 }
 
