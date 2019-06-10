@@ -63,6 +63,9 @@ body {
   font-weight: normal;
   font-size: 12px;
 }
+body.dialog-open {
+  overflow: hidden;
+}
 
 /* Info dialog */
 .dialog.info .buttons {

@@ -48,23 +48,29 @@ export function readJsonFile(file) {
 export function createDialog(options) {
   options = $.extend({
     closeBy: 'esc,backdrop',
-    closeByEsc: true, closeByBackdrop: true, beforeOpen: $.noop
+    beforeOpen: $.noop
   }, options);
 
   const $el = $(options.selector);
-  $el.on('click', event => {
-    const $target = $(event.target);
-    if (
-      $target.closest('.dialog-close').length ||
-      (options.closeBy.includes('backdrop') && !$target.closest('.dialog-box').length)
-    ) {
-      $el.get(0).close();
-    }
-  });
-  $el.on('cancel', event => {
-    if (!options.closeBy.includes('esc')) {
-      event.preventDefault();
-    }
+
+  $el.on({
+    click: event => {
+      const $target = $(event.target);
+      if (
+        $target.closest('.dialog-close').length ||
+        (options.closeBy.includes('backdrop') && !$target.closest('.dialog-box').length)
+      ) {
+        $el.get(0).close();
+      }
+    },
+    cancel: event => {
+      if (!options.closeBy.includes('esc')) {
+        event.preventDefault();
+      }
+    },
+    close: () => {
+      $('body').removeClass('dialog-open');
+    } 
   });
 
   const dialog = {
@@ -72,6 +78,7 @@ export function createDialog(options) {
       options.beforeOpen($el, config);
       $('dialog[open]').each((index, el) => el.close());
       $el.get(0).showModal();
+      $('body').addClass('dialog-open');
     },
     close: () => $el.get(0).close()
   };

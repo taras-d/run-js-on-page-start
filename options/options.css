@@ -18,10 +18,13 @@
 
 .script {
   border: 1px solid var(--border-color);
+}
+.script:not(:last-of-type) {
   margin-bottom: 10px;
 }
 .script .panel {
   display: flex;
+  border-bottom: 1px solid var(--border-color);
 }
 .script .origin {
   flex: 1;
@@ -52,14 +55,14 @@
 }
 
 .dialog.edit {
-  max-width: 500px;
+  max-width: 600px;
 }
 .dialog.edit .origin {
   max-width: 300px;
   width: 100%;
 }
 .dialog.edit .code {
-  height: 300px;
+  height: 350px;
   border: 1px solid var(--border-color);
 }
 .dialog.edit .actions {
