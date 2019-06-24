@@ -6,6 +6,8 @@ import {
 } from '../util.js';
 
 const scriptKey = 'RunJsOnPageStart';
+let script;
+let injectedCode;
 let editor;
 
 function init() {
@@ -14,18 +16,26 @@ function init() {
 
   initEditor();
 
-  getFromLocalStorage(['script']).then(data => {
-    const script = data.script || {};
+  Promise.all([
+    getSavedScript(),
+    getInjectedCode()
+  ]).then(res => {
+    [script, injectedCode] = res;
 
-    editor.setValue(script.code || '');
-    editor.gotoLine((script.cursorRow || 0) + 1, script.cursorColumn || 0);
-    editor.session.setScrollTop(script.scrollTop || 0);
-    editor.session.setScrollLeft(script.scrollLeft || 0);
+    editor.setValue(script.code);
+    editor.gotoLine(script.cursorRow + 1, script.cursorColumn);
+    editor.session.setScrollTop(script.scrollTop);
+    editor.session.setScrollLeft(script.scrollLeft);
 
-    editor.session.on('change', saveChanges);
+    editor.session.on('change', () => {
+      saveChanges();
+      updateStatus();
+    });
     editor.session.on('changeScrollTop', saveChanges);
     editor.session.on('changeScrollLeft', saveChanges);
     editor.selection.on('changeCursor', saveChanges);
+
+    updateStatus();
   });
 }
 
@@ -38,6 +48,42 @@ function initEditor() {
     tabSize: 2,
     useSoftTabs: true
   });
+}
+
+function getSavedScript() {
+  return getFromLocalStorage(['script']).then(res => {
+    return Object.assign({
+      code: '',
+      cursorRow: 0,
+      cursorColumn: 0,
+      scrollTop: 0,
+      scrollLeft: 0
+    }, res.script);
+  });
+}
+
+function getInjectedCode() {
+  return executeScript({ code: `localStorage['${scriptKey}']` }).then(res => res[0]);
+}
+
+function updateStatus() {
+  let title;
+  let color;
+
+  if (typeof injectedCode !== 'string') {
+    title = 'Not injected';
+    color = 'silver';
+  } else if (injectedCode === editor.getValue()) {
+    title = 'Injected';
+    color = 'limegreen';
+  } else {
+    title = 'Old script injected';
+    color = 'orange';
+  }
+
+  const statusEl = document.querySelector('.footer .status');
+  statusEl.title = title;
+  statusEl.style.backgroundColor = color;
 }
 
 function saveChanges() {
