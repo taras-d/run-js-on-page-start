@@ -3,30 +3,19 @@
 <html>
   <head>
     <title>RunJsOnPageStart</title>
-    <link rel="stylesheet" href="../common.css">
     <link rel="stylesheet" href="popup.css">
   </head>
   <body>
-    <header class="panel header">Run javascript code before page starts loading</header>
+    <header class="panel header">
+      Run javascript code before page starts loading
+    </header>
     <div class="code"></div>
     <div class="panel footer">
-      <button title="Save to local storage">Save</button>
-      <button title="Save to local storage and reload page" class="reload">Save & reload</button>
-      <a class="link manage-scripts">Manage scripts</a>
+      <button name="inject">Inject script</button>
+      <button name="remove">Remove script</button>
     </div>
 
-    <dialog class="dialog info">
-      <div class="dialog-box">
-        <div class="dialog-title"></div>
-        <div class="dialog-body">
-          <div class="text"></div>
-          <div class="buttons"></div>
-        </div>
-      </div>
-    </dialog>
-
     <script src="../lib/ace/ace.js"></script>
-    <script src="../lib/jquery/jquery.min.js"></script>
     <script src="popup.js" type="module"></script>
   </body>
 </html>

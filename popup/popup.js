@@ -1,45 +1,36 @@
 import {
   setToLocalStorage,
   getFromLocalStorage,
-  getSelectedTab,
   executeScript,
-  reloadTab,
-  infoDialog
+  reloadTab
 } from '../util.js';
 
-let scripts;
-let currentScript;
-let selectedTab;
+const scriptKey = 'RunJsOnPageStart';
 let editor;
 
 function init() {
-  $('.footer button').on('click', saveClick);
-  $('.footer .manage-scripts').on('click', manageScriptsClick);
+  document.querySelector('.footer button[name="inject"]').addEventListener('click', injectScriptClick);
+  document.querySelector('.footer button[name="remove"]').addEventListener('click', removeScriptClick);
 
   initEditor();
 
-  Promise.all([
-    getFromLocalStorage(['scripts']),
-    getSelectedTab()
-  ]).then(res => {
-    scripts = res[0].scripts || [];
-    selectedTab = res[1];
+  getFromLocalStorage(['script']).then(data => {
+    const script = data.script || {};
 
-    const origin = new URL(selectedTab.url).origin;
-  
-    currentScript = scripts.find(s => s.origin === origin);
-    if (!currentScript) {
-      currentScript = { origin, code: '' };
-      scripts.unshift(currentScript);
-    }
-  
-    editor.setValue(currentScript.code);
-    editor.selection.cursor.setPosition(0);
+    editor.setValue(script.code || '');
+    editor.gotoLine((script.cursorRow || 0) + 1, script.cursorColumn || 0);
+    editor.session.setScrollTop(script.scrollTop || 0);
+    editor.session.setScrollLeft(script.scrollLeft || 0);
+
+    editor.session.on('change', saveChanges);
+    editor.session.on('changeScrollTop', saveChanges);
+    editor.session.on('changeScrollLeft', saveChanges);
+    editor.selection.on('changeCursor', saveChanges);
   });
 }
 
 function initEditor() {
-  editor = ace.edit( $('.code').get(0) );
+  editor = ace.edit(document.querySelector('.code'));
   editor.setOptions({
     theme: 'ace/theme/chrome',
     mode: 'ace/mode/javascript',
@@ -49,33 +40,35 @@ function initEditor() {
   });
 }
 
-function saveClick(event) {
-  const date = new Date().toJSON();
-  currentScript.createdAt = currentScript.createdAt || date;
-  currentScript.updatedAt = date;
-  currentScript.code = editor.getValue();
-
-  const code = currentScript.code ?
-    `localStorage['RunJsOnPageStart'] = ${JSON.stringify(currentScript.code)}` :
-    `delete localStorage['RunJsOnPageStart']`;
-  
-  executeScript({ code }).then(() => {
-    return setToLocalStorage({ scripts });
-  }).then(() => {
-    if ( $(event.target).hasClass('reload') ) {
-      return reloadTab();
+function saveChanges() {
+  const cursor = editor.selection.cursor.getPosition();
+  setToLocalStorage({
+    script: {
+      code: editor.getValue(),
+      cursorRow: cursor.row,
+      cursorColumn: cursor.column,
+      scrollTop: editor.session.getScrollTop(),
+      scrollLeft: editor.session.getScrollLeft()
     }
-  }).then(() => {
-    window.close();
-  }).catch(err => {
-    infoDialog.open({
-      title: 'Error', text: err.message, buttons: [{ text: 'Ok' }]
-    });
   });
 }
 
-function manageScriptsClick() {
-  chrome.runtime.openOptionsPage();
+function injectScriptClick() {
+  executeScript({
+    code: `localStorage['${scriptKey}'] = ${JSON.stringify(editor.getValue())}`
+  }).then(() => {
+    return reloadTab();
+  }).then(() => {
+    window.close();
+  });
+}
+
+function removeScriptClick() {
+  executeScript({ code: `delete localStorage['${scriptKey}']` }).then(() => {
+    return reloadTab();
+  }).then(() => {
+    window.close();
+  });
 }
 
 init();
