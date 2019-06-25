@@ -5,28 +5,30 @@
     <link rel="stylesheet" href="popup.css">
   </head>
   <body>
-    <div class="app">
-      <div class="section script-list">
-        <div class="section-header">
+    <div class="container">
+      <div class="panel script-list">
+        <div class="panel-header">
           <div class="name">Scripts</div>
           <div class="actions">
-            <a class="link" name="add">add script</a>
+            <a class="link" name="add" title="Add new script">add script</a>
           </div>
         </div>
-        <div class="section-body">
-          <ul></ul>
+        <div class="panel-body"></div>
+        <div class="panel-footer">
+          <span class="not-injected">Script is not injected</span>
+          <a class="link injected" title="Remove injected script and reload tab">Remove injected script</a>
         </div>
       </div>
-      <div class="section script-edit hidden">
-        <div class="section-header">
+      <div class="panel script-edit hidden">
+        <div class="panel-header">
           <span class="name">Add/edit script</span>
           <div class="actions">
-            <a class="link" name="cancel">cancel</a>
-            <a class="link" name="inject">inject</a>
-            <a class="link" name="save">save</a>
+            <a class="link" name="back" title="Back to list">back</a>
+            <a class="link" name="inject" title="Save changes, inject script and reload tab">inject</a>
+            <a class="link" name="save" title="Save changes">save</a>
           </div>
         </div>
-        <div class="section-body">
+        <div class="panel-body">
           <input placeholder="Script name" class="name">
           <div class="code"></div>
         </div>

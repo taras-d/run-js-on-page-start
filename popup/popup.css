@@ -1,6 +1,6 @@
 :root {
-  --section-bg-color: #f3f3f3;
-  --section-border-color: #d0d0d0;
+  --panel-bg-color: #f3f3f3;
+  --panel-border-color: #d0d0d0;
   --base-text-color: #333;
   --link-color: #1155cc;
 }
@@ -17,32 +17,37 @@ body {
   font-size: 12px;
 }
 
-.app {
+.container {
   width: 450px;
-  height: 250px;
+  height: 275px;
 }
 
-.section {
+.panel {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
-.section-header {
+.panel-header {
   display: flex;
-  background-color: var(--section-bg-color);
-  border-bottom: 1px solid var(--section-border-color);
+  background-color: var(--panel-bg-color);
+  border-bottom: 1px solid var(--panel-border-color);
   padding: 4px 6px;
 }
-.section-header .name {
+.panel-header .name {
   flex: 1;
   font-weight: bold;
 }
-.section-header .actions .link {
+.panel-header .actions .link {
   padding-left: 3px;
 }
-.section-body {
+.panel-body {
   flex: 1;
   overflow: auto;
+}
+.panel-footer {
+  background-color: var(--panel-bg-color);
+  border-top: 1px solid var(--panel-border-color);
+  padding: 4px 6px;
 }
 
 .link {
@@ -55,44 +60,51 @@ body {
   display: none;
 }
 
-.script-list .section-body ul {
+.script-list .panel-body ul {
   padding: 0;
   margin: 0;
 }
-.script-list .section-body li {
+.script-list .panel-body li {
   display: flex;
   padding: 3px 6px;
+  cursor: pointer;
 }
-.script-list .section-body li:not(.empty):nth-child(odd) {
+.script-list .panel-body li:nth-child(odd) {
   background-color: #f5f5f5;
 }
-.script-list .section-body li .name {
+.script-list .panel-body li .name {
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.script-list .section-body li .actions .link {
+.script-list .panel-body li .actions .link {
   padding-left: 5px;
 }
-.script-list .section-body .empty {
+.script-list .panel-body .empty {
   display: block;
   text-align: center;
   opacity: 0.5;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.script-list .panel-footer .not-injected {
+  opacity: 0.5;
 }
 
-.script-edit .section-body {
+.script-edit .panel-body {
   display: flex;
   flex-direction: column;
 }
-.script-edit .section-body .name {
+.script-edit .panel-body .name {
   width: 100%;
   border: 0;
-  border-bottom: 1px solid var(--section-border-color);
+  border-bottom: 1px solid var(--panel-border-color);
   padding: 2px 6px;
   outline: none;
   font-size: inherit;
 }
-.script-edit .section-body .code {
+.script-edit .panel-body .code {
   flex: 1;
 }

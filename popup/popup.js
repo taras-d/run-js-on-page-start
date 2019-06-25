@@ -1,178 +1,213 @@
-const scriptListEl = document.querySelector('.section.script-list');
-      const scriptEditEl = document.querySelector('.section.script-edit');
+import {
+  getFromLocalStorage,
+  setToLocalStorage,
+  executeScript,
+  reloadTab,
+  createElement
+} from '../util.js';
 
-      let editor;
-      let scripts = [];
-      let currentScript;
+const injectKey = 'RunJsOnPageStart'; 
+const scriptListPanel = document.querySelector('.panel.script-list');
+const scriptEditPanel = document.querySelector('.panel.script-edit');
 
-      function init() {
-        document.querySelectorAll('.section-header .actions .link').forEach(el => {
-          el.addEventListener('click', headerActionClick);
-        });
+let editor;
+let scripts = [];
+let currentScript;
 
-        loadScripts();
-      }
+function init() {
+  document.querySelectorAll('.panel-header .actions .link').forEach(el => {
+    el.addEventListener('click', headerActionClick);
+  });
 
-      function loadScripts() {
-        // To do - get from local storage
-        renderScripts();
-      }
+  scriptListPanel.querySelector('.panel-footer .injected')
+    .addEventListener('click', removeInjectedScript);
 
-      function headerActionClick(e) {
-        switch (e.target.name) {
-          case 'add':
-            editScript(null);
-            break;
+  getFromLocalStorage(['scripts']).then(data => {
+    scripts = data.scripts || [];
+    renderScripts();
+  });
 
-          case 'cancel':
-            openSection('script-list');
-            currentScript = null;
-            break;
+  updateStatus();
+}
 
-          case 'inject':
-            saveCurrentScript(true);
-            break;
+function headerActionClick(e) {
+  switch (e.target.name) {
+    case 'add':
+      editScript(null);
+      break;
 
-          case 'save':
-            saveCurrentScript();
-            break;
+    case 'back':
+      openPanel('script-list');
+      currentScript = null;
+      break;
+
+    case 'inject':
+      saveCurrentScript(true);
+      break;
+
+    case 'save':
+      saveCurrentScript();
+      break;
+  }
+}
+
+function updateStatus() {
+  executeScript({ code: `'${injectKey}' in localStorage` }).then(res => {
+    const injected = res[0];
+    scriptListPanel.querySelector('.panel-footer .not-injected')
+      .classList.toggle('hidden', injected);
+    scriptListPanel.querySelector('.panel-footer .injected')
+      .classList.toggle('hidden', !injected);
+  });
+}
+
+function openPanel(className) {
+  document.querySelectorAll('.panel').forEach(el => {
+    el.classList.toggle('hidden', !el.classList.contains(className));
+  });
+}
+
+function editScript(script) {
+  openPanel('script-edit');
+
+  currentScript = script || { name: '', code: '' };
+
+  const headerName = scriptEditPanel.querySelector('.panel-header .name');
+  headerName.textContent = `${script? 'Edit': 'Add'} script`;
+
+  const scriptName = scriptEditPanel.querySelector('.panel-body .name');
+  scriptName.value = currentScript.name;
+
+  if (!editor) {
+    editor = ace.edit(scriptEditPanel.querySelector('.code'));
+    editor.setOptions({
+      theme: 'ace/theme/chrome',
+      mode: 'ace/mode/javascript',
+      fontSize: 11,
+      tabSize: 2,
+      useSoftTabs: true
+    });
+  }
+
+  editor.setValue(currentScript.code);
+  editor.selection.clearSelection();
+}
+
+function saveCurrentScript(inject) {
+  currentScript.name = scriptEditPanel.querySelector('.panel-body .name').value;
+  currentScript.code = editor.getValue();
+
+  if (!currentScript.name.trim()) {
+    currentScript.name = getScriptName();
+  }
+
+  if (!scripts.includes(currentScript)) {
+    scripts.unshift(currentScript);
+  }
+
+  setToLocalStorage({ scripts }).then(() => {
+    if (inject) {
+      return injectScript(currentScript);
+    }
+
+    currentScript = null;
+    openPanel('script-list');
+    renderScripts();
+  });
+}
+
+function renderScripts() {
+  const body = scriptListPanel.querySelector('.panel-body');
+  body.innerHTML = '';
+
+  if (scripts.length) {
+    const ul = createElement({ tag: 'ul' });
+    scripts.forEach((script, index) => {
+      ul.appendChild(getScriptItem(script, index));
+    });
+    body.appendChild(ul);
+  } else {
+    body.appendChild(
+      createElement({ tag: 'div', className: 'empty', text: 'no scripts' })
+    );
+  }
+}
+
+function getScriptItem(script) {
+  const li = createElement({
+    tag: 'li',
+    on: { click: () => editScript(script) }
+  });
+
+  li.appendChild(
+    createElement({
+      tag: 'span', className: 'name',
+      text: script.name, title: script.name
+    })
+  );
+  
+  const actions = createElement({ tag: 'span', className: 'actions' });
+  actions.appendChild(
+    createElement({
+      tag: 'a', className: 'link', text: 'inject',
+      title: 'Save changes, inject script and reload tab',
+      on: {
+        click: e => {
+          e.stopPropagation();
+          injectScript(script);
         }
       }
-
-      function openSection(className) {
-        document.querySelectorAll('.section').forEach(el => {
-          el.classList.toggle('hidden', !el.classList.contains(className));
-        });
-      }
-
-      function editScript(script) {
-        openSection('script-edit');
-
-        currentScript = script || { name: '', code: '' };
-
-        const headerName = scriptEditEl.querySelector('.section-header .name');
-        headerName.textContent = `${script? 'Edit': 'Add'} script`;
-
-        const scriptName = scriptEditEl.querySelector('.section-body .name');
-        scriptName.value = currentScript.name;
-
-        if (!editor) {
-          editor = ace.edit(scriptEditEl.querySelector('.code'));
-          editor.setOptions({
-            theme: 'ace/theme/chrome',
-            mode: 'ace/mode/javascript',
-            fontSize: 11,
-            tabSize: 2,
-            useSoftTabs: true
-          });
-        }
-
-        editor.setValue(currentScript.code);
-        editor.selection.clearSelection();
-      }
-
-      function saveCurrentScript(inject) {
-        currentScript.name = scriptEditEl.querySelector('.section-body .name').value;
-        currentScript.code = editor.getValue();
-
-        if (!currentScript.name.trim()) {
-          currentScript.name = getTempName();
-        }
-
-        if (!scripts.includes(currentScript)) {
-          scripts.unshift(currentScript);
-        }
-
-        // To do - save to local storage
-
-        if (inject) {
-          injectScript(currentScript);
-        } else {
-          currentScript = null;
-          openSection('script-list');
-          renderScripts();
+    })
+  );
+  actions.appendChild(
+    createElement({
+      tag: 'a', className: 'link', text: 'delete', title: 'Delete script',
+      on: {
+        click: e => {
+          e.stopPropagation();
+          deleteScript(script);
         }
       }
+    })
+  );
+  li.appendChild(actions);
 
-      function createElement(config) {
-        const el = document.createElement(config.tag);
-        el.className = config.className;
-        el.title = config.title;
-        el.textContent = config.text;
-        if (config.onClick) {
-          el.addEventListener('click', config.onClick);
-        }
-        return el;
-      }
+  return li;
+}
 
-      function renderScripts() {
-        const listEl = scriptListEl.querySelector('ul');
-        listEl.innerHTML = '';
+function injectScript(script) {
+  executeScript({
+    code: `localStorage['${injectKey}'] = ${JSON.stringify(script.code)}`
+  }).then(() => {
+    return reloadTab();
+  }).then(() => {
+    window.close();
+  })
+}
 
-        if (scripts.length) {
-          scripts.forEach((script, index) => {
-            listEl.appendChild(getScriptItem(script, index));
-          });
-        } else {
-          listEl.appendChild(
-            createElement({ tag: 'li', className: 'empty', text: 'No scripts' })
-          );
-        }
-      }
+function deleteScript(script) {
+  scripts.splice(scripts.indexOf(script), 1);
+  renderScripts();
+  setToLocalStorage({ scripts });
+}
 
-      function getScriptItem(script) {
-        const li = createElement({ tag: 'li' });
+function getScriptName() {
+  const nums = scripts.map(script => {
+    const res = (script.name || '').match(/^script #(\d+)$/i);
+    return res && res[1] ? res[1]: '';
+  }).filter(n => n);
+  const nextNum = nums.length? Math.max(...nums) + 1: 1;
+  return `Script #${nextNum}`;
+}
 
-        li.appendChild(
-          createElement({
-            tag: 'span', className: 'name',
-            text: script.name, title: script.name
-          })
-        );
-        
-        const actions = createElement({ tag: 'span', className: 'actions' });
-        actions.appendChild(
-          createElement({
-            tag: 'a', className: 'link', text: 'inject',
-            onClick: () => injectScript(script)
-          })
-        );
-        actions.appendChild(
-          createElement({
-            tag: 'a', className: 'link', text: 'edit',
-            onClick: () => editScript(script)
-          })
-        );
-        actions.appendChild(
-          createElement({
-            tag: 'a', className: 'link', text: 'delete',
-            onClick: () => deleteScript(script)
-          })
-        );
-        li.appendChild(actions);
+function removeInjectedScript() {
+  executeScript({
+    code: `delete localStorage['${injectKey}']`
+  }).then(() => {
+    return reloadTab();
+  }).then(() => {
+    window.close();
+  });
+}
 
-        return li;
-      }
-
-      function injectScript(script) {
-        console.log(script);
-      }
-
-      function deleteScript(script) {
-        scripts.splice(scripts.indexOf(script), 1);
-        renderScripts();
-      }
-
-      function getTempName() {
-        const nums = [];
-        scripts.forEach(script => {
-          const res = (script.name || '').match(/^script #(\d+)$/i);
-          if (res && res[1]) {
-            nums.push(+res[1]);
-          }
-        });
-        const nextNum = nums.length? Math.max(...nums) + 1: 1;
-        return `Script #${nextNum}`;
-      }
-
-      init();
+init();
