@@ -1,7 +1,7 @@
 :root {
   --panel-bg-color: #f3f3f3;
   --panel-border-color: #d0d0d0;
-  --base-text-color: #333;
+  --base-text-color: #303942;
   --link-color: #1155cc;
 }
 
@@ -71,6 +71,9 @@ body {
 }
 .script-list .panel-body li:nth-child(odd) {
   background-color: #f5f5f5;
+}
+.script-list .panel-body li:hover {
+  background-color: #eef3fa;
 }
 .script-list .panel-body li .name {
   flex: 1;
