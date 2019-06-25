@@ -1,120 +1,178 @@
-import {
-  setToLocalStorage,
-  getFromLocalStorage,
-  executeScript,
-  reloadTab
-} from '../util.js';
+const scriptListEl = document.querySelector('.section.script-list');
+      const scriptEditEl = document.querySelector('.section.script-edit');
 
-const scriptKey = 'RunJsOnPageStart';
-let script;
-let injectedCode;
-let editor;
+      let editor;
+      let scripts = [];
+      let currentScript;
 
-function init() {
-  document.querySelector('.footer button[name="inject"]').addEventListener('click', injectScriptClick);
-  document.querySelector('.footer button[name="remove"]').addEventListener('click', removeScriptClick);
+      function init() {
+        document.querySelectorAll('.section-header .actions .link').forEach(el => {
+          el.addEventListener('click', headerActionClick);
+        });
 
-  initEditor();
+        loadScripts();
+      }
 
-  Promise.all([
-    getSavedScript(),
-    getInjectedCode()
-  ]).then(res => {
-    [script, injectedCode] = res;
+      function loadScripts() {
+        // To do - get from local storage
+        renderScripts();
+      }
 
-    editor.setValue(script.code);
-    editor.gotoLine(script.cursorRow + 1, script.cursorColumn);
-    editor.session.setScrollTop(script.scrollTop);
-    editor.session.setScrollLeft(script.scrollLeft);
+      function headerActionClick(e) {
+        switch (e.target.name) {
+          case 'add':
+            editScript(null);
+            break;
 
-    editor.session.on('change', () => {
-      saveChanges();
-      updateStatus();
-    });
-    editor.session.on('changeScrollTop', saveChanges);
-    editor.session.on('changeScrollLeft', saveChanges);
-    editor.selection.on('changeCursor', saveChanges);
+          case 'cancel':
+            openSection('script-list');
+            currentScript = null;
+            break;
 
-    updateStatus();
-  });
-}
+          case 'inject':
+            saveCurrentScript(true);
+            break;
 
-function initEditor() {
-  editor = ace.edit(document.querySelector('.code'));
-  editor.setOptions({
-    theme: 'ace/theme/chrome',
-    mode: 'ace/mode/javascript',
-    fontSize: 11,
-    tabSize: 2,
-    useSoftTabs: true
-  });
-}
+          case 'save':
+            saveCurrentScript();
+            break;
+        }
+      }
 
-function getSavedScript() {
-  return getFromLocalStorage(['script']).then(res => {
-    return Object.assign({
-      code: '',
-      cursorRow: 0,
-      cursorColumn: 0,
-      scrollTop: 0,
-      scrollLeft: 0
-    }, res.script);
-  });
-}
+      function openSection(className) {
+        document.querySelectorAll('.section').forEach(el => {
+          el.classList.toggle('hidden', !el.classList.contains(className));
+        });
+      }
 
-function getInjectedCode() {
-  return executeScript({ code: `localStorage['${scriptKey}']` }).then(res => res[0]);
-}
+      function editScript(script) {
+        openSection('script-edit');
 
-function updateStatus() {
-  let title;
-  let color;
+        currentScript = script || { name: '', code: '' };
 
-  if (typeof injectedCode !== 'string') {
-    title = 'Not injected';
-    color = 'silver';
-  } else if (injectedCode === editor.getValue()) {
-    title = 'Injected';
-    color = 'limegreen';
-  } else {
-    title = 'Old script injected';
-    color = 'orange';
-  }
+        const headerName = scriptEditEl.querySelector('.section-header .name');
+        headerName.textContent = `${script? 'Edit': 'Add'} script`;
 
-  const statusEl = document.querySelector('.footer .status');
-  statusEl.title = title;
-  statusEl.style.backgroundColor = color;
-}
+        const scriptName = scriptEditEl.querySelector('.section-body .name');
+        scriptName.value = currentScript.name;
 
-function saveChanges() {
-  const cursor = editor.selection.cursor.getPosition();
-  setToLocalStorage({
-    script: {
-      code: editor.getValue(),
-      cursorRow: cursor.row,
-      cursorColumn: cursor.column,
-      scrollTop: editor.session.getScrollTop(),
-      scrollLeft: editor.session.getScrollLeft()
-    }
-  });
-}
+        if (!editor) {
+          editor = ace.edit(scriptEditEl.querySelector('.code'));
+          editor.setOptions({
+            theme: 'ace/theme/chrome',
+            mode: 'ace/mode/javascript',
+            fontSize: 11,
+            tabSize: 2,
+            useSoftTabs: true
+          });
+        }
 
-function injectScriptClick() {
-  executeScript({
-    code: `localStorage['${scriptKey}'] = ${JSON.stringify(editor.getValue())}`
-  }).then(() => {
-    return reloadTab();
-  }).then(() => {
-    window.close();
-  });
-}
+        editor.setValue(currentScript.code);
+        editor.selection.clearSelection();
+      }
 
-function removeScriptClick() {
-  executeScript({ code: `delete localStorage['${scriptKey}']` }).then(() => {
-    return reloadTab();
-  }).then(() => {
-    window.close();
-  });
-}
+      function saveCurrentScript(inject) {
+        currentScript.name = scriptEditEl.querySelector('.section-body .name').value;
+        currentScript.code = editor.getValue();
 
-init();
+        if (!currentScript.name.trim()) {
+          currentScript.name = getTempName();
+        }
+
+        if (!scripts.includes(currentScript)) {
+          scripts.unshift(currentScript);
+        }
+
+        // To do - save to local storage
+
+        if (inject) {
+          injectScript(currentScript);
+        } else {
+          currentScript = null;
+          openSection('script-list');
+          renderScripts();
+        }
+      }
+
+      function createElement(config) {
+        const el = document.createElement(config.tag);
+        el.className = config.className;
+        el.title = config.title;
+        el.textContent = config.text;
+        if (config.onClick) {
+          el.addEventListener('click', config.onClick);
+        }
+        return el;
+      }
+
+      function renderScripts() {
+        const listEl = scriptListEl.querySelector('ul');
+        listEl.innerHTML = '';
+
+        if (scripts.length) {
+          scripts.forEach((script, index) => {
+            listEl.appendChild(getScriptItem(script, index));
+          });
+        } else {
+          listEl.appendChild(
+            createElement({ tag: 'li', className: 'empty', text: 'No scripts' })
+          );
+        }
+      }
+
+      function getScriptItem(script) {
+        const li = createElement({ tag: 'li' });
+
+        li.appendChild(
+          createElement({
+            tag: 'span', className: 'name',
+            text: script.name, title: script.name
+          })
+        );
+        
+        const actions = createElement({ tag: 'span', className: 'actions' });
+        actions.appendChild(
+          createElement({
+            tag: 'a', className: 'link', text: 'inject',
+            onClick: () => injectScript(script)
+          })
+        );
+        actions.appendChild(
+          createElement({
+            tag: 'a', className: 'link', text: 'edit',
+            onClick: () => editScript(script)
+          })
+        );
+        actions.appendChild(
+          createElement({
+            tag: 'a', className: 'link', text: 'delete',
+            onClick: () => deleteScript(script)
+          })
+        );
+        li.appendChild(actions);
+
+        return li;
+      }
+
+      function injectScript(script) {
+        console.log(script);
+      }
+
+      function deleteScript(script) {
+        scripts.splice(scripts.indexOf(script), 1);
+        renderScripts();
+      }
+
+      function getTempName() {
+        const nums = [];
+        scripts.forEach(script => {
+          const res = (script.name || '').match(/^script #(\d+)$/i);
+          if (res && res[1]) {
+            nums.push(+res[1]);
+          }
+        });
+        const nextNum = nums.length? Math.max(...nums) + 1: 1;
+        return `Script #${nextNum}`;
+      }
+
+      init();

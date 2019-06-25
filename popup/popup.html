@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
   <head>
@@ -6,14 +5,32 @@
     <link rel="stylesheet" href="popup.css">
   </head>
   <body>
-    <header class="panel header">
-      Run javascript code before page starts loading
-    </header>
-    <div class="code"></div>
-    <div class="panel footer">
-      <button name="inject">Inject script</button>
-      <button name="remove">Remove script</button>
-      <div class="status"></div>
+    <div class="app">
+      <div class="section script-list">
+        <div class="section-header">
+          <div class="name">Scripts</div>
+          <div class="actions">
+            <a class="link" name="add">add script</a>
+          </div>
+        </div>
+        <div class="section-body">
+          <ul></ul>
+        </div>
+      </div>
+      <div class="section script-edit hidden">
+        <div class="section-header">
+          <span class="name">Add/edit script</span>
+          <div class="actions">
+            <a class="link" name="cancel">cancel</a>
+            <a class="link" name="inject">inject</a>
+            <a class="link" name="save">save</a>
+          </div>
+        </div>
+        <div class="section-body">
+          <input placeholder="Script name" class="name">
+          <div class="code"></div>
+        </div>
+      </div>
     </div>
 
     <script src="../lib/ace/ace.js"></script>

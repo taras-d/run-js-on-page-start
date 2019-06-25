@@ -1,7 +1,8 @@
 :root {
-  --panel-bg-color: #f3f3f3;
-  --border-color: #d0d0d0;
-  --text-color: #333;
+  --section-bg-color: #f3f3f3;
+  --section-border-color: #d0d0d0;
+  --base-text-color: #333;
+  --link-color: #1155cc;
 }
 
 * {
@@ -14,43 +15,84 @@ body {
   color: var(--text-color);
   font-family: sans-serif;
   font-size: 12px;
-  width: 500px;
 }
 
-.panel {
-  background-color: var(--panel-bg-color);
-  padding: 4px;
+.app {
+  width: 450px;
+  height: 250px;
 }
 
-.header {
-  padding: 6px 4px;
+.section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.section-header {
+  display: flex;
+  background-color: var(--section-bg-color);
+  border-bottom: 1px solid var(--section-border-color);
+  padding: 4px 6px;
+}
+.section-header .name {
+  flex: 1;
   font-weight: bold;
-  border-bottom: 1px solid var(--border-color);
+}
+.section-header .actions .link {
+  padding-left: 3px;
+}
+.section-body {
+  flex: 1;
+  overflow: auto;
 }
 
-.code {
+.link {
+  color: var(--link-color);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+.script-list .section-body ul {
+  padding: 0;
+  margin: 0;
+}
+.script-list .section-body li {
+  display: flex;
+  padding: 3px 6px;
+}
+.script-list .section-body li:not(.empty):nth-child(odd) {
+  background-color: #f5f5f5;
+}
+.script-list .section-body li .name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.script-list .section-body li .actions .link {
+  padding-left: 5px;
+}
+.script-list .section-body .empty {
   display: block;
-  width: 100%;
-  height: 240px;
+  text-align: center;
+  opacity: 0.5;
 }
 
-.footer {
-  border-top: 1px solid var(--border-color);
-  position: relative;
+.script-edit .section-body {
+  display: flex;
+  flex-direction: column;
 }
-.footer button {
+.script-edit .section-body .name {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--section-border-color);
+  padding: 2px 6px;
+  outline: none;
   font-size: inherit;
-  font-family: inherit;
-  color: inherit;
-  padding: 0 7px;
-  height: 18px;
 }
-.footer .status {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 10px;
-  height: 10px;
-  border-radius: 100%;
+.script-edit .section-body .code {
+  flex: 1;
 }
