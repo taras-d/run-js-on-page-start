@@ -19,7 +19,7 @@ function init() {
     el.addEventListener('click', headerActionClick);
   });
 
-  scriptListPanel.querySelector('.panel-footer .injected')
+  scriptListPanel.querySelector('.panel-footer .remove-injected')
     .addEventListener('click', removeInjectedScript);
 
   getFromLocalStorage(['scripts']).then(data => {
@@ -53,11 +53,14 @@ function headerActionClick(e) {
 
 function updateStatus() {
   executeScript({ code: `'${injectKey}' in localStorage` }).then(res => {
-    const injected = res[0];
-    scriptListPanel.querySelector('.panel-footer .not-injected')
-      .classList.toggle('hidden', injected);
-    scriptListPanel.querySelector('.panel-footer .injected')
-      .classList.toggle('hidden', !injected);
+    const status = scriptListPanel.querySelector('.panel-footer .status');
+    const removeInjected = scriptListPanel.querySelector('.panel-footer .remove-injected');
+    if (res[0]) {
+      status.classList.add('hidden');
+      removeInjected.classList.remove('hidden');
+    } else {
+      status.textContent = 'Script is not injected';
+    }
   });
 }
 

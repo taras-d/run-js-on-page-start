@@ -89,7 +89,7 @@ body {
   top: 50%;
   transform: translateY(-50%);
 }
-.script-list .panel-footer .not-injected {
+.script-list .panel-footer .status {
   opacity: 0.5;
 }
 
