@@ -74,6 +74,8 @@ function editScript(script) {
   openPanel('script-edit');
 
   currentScript = script || { name: '', code: '' };
+  currentScript.name = currentScript.name || '';
+  currentScript.code = currentScript.code || '';
 
   const headerName = scriptEditPanel.querySelector('.panel-header .name');
   headerName.textContent = `${script? 'Edit': 'Add'} script`;
@@ -101,7 +103,7 @@ function saveCurrentScript(inject) {
   currentScript.code = editor.getValue();
 
   if (!currentScript.name.trim()) {
-    currentScript.name = getScriptName();
+    currentScript.name = getDefaultScriptName();
   }
 
   if (!scripts.includes(currentScript)) {
@@ -194,13 +196,12 @@ function deleteScript(script) {
   setToLocalStorage({ scripts });
 }
 
-function getScriptName() {
+function getDefaultScriptName() {
   const nums = scripts.map(script => {
-    const res = (script.name || '').match(/^script #(\d+)$/i);
-    return res && res[1] ? res[1]: '';
-  }).filter(n => n);
-  const nextNum = nums.length? Math.max(...nums) + 1: 1;
-  return `Script #${nextNum}`;
+    const res = (script.name || '').match(/^script(\d+)$/i);
+    return res && res[1] ? +res[1]: '';
+  }).filter(num => num);
+  return `Script${Math.max(0, ...nums) + 1}`;
 }
 
 function removeInjectedScript() {
