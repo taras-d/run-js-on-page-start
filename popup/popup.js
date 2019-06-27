@@ -181,8 +181,9 @@ function getScriptItem(script) {
 }
 
 function injectScript(script) {
+  const code = `(()=>{\n${script.code}\n})();`;
   executeScript({
-    code: `localStorage['${injectKey}'] = ${JSON.stringify(script.code)}`
+    code: `localStorage['${injectKey}'] = ${JSON.stringify(code)}`
   }).then(() => {
     return reloadTab();
   }).then(() => {
