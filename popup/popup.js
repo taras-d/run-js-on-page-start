@@ -155,7 +155,7 @@ function getScriptItem(script) {
   actions.appendChild(
     createElement({
       tag: 'a', className: 'link', text: 'inject',
-      title: 'Save changes, inject script and reload tab',
+      title: 'Inject script and reload tab',
       on: {
         click: e => {
           e.stopPropagation();

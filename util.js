@@ -15,9 +15,15 @@ export const reloadTab = toPromise(chrome.tabs, 'reload');
 
 export function createElement(config) {
   const el = document.createElement(config.tag);
-  el.className = config.className || '';
-  el.title = config.title || '';
-  el.textContent = config.text || '';
+  if (config.className) {
+    el.className = config.className;
+  }
+  if (config.title) {
+    el.title = config.title;
+  }
+  if (config.text) {
+    el.textContent = config.text;
+  }
 
   Object.assign(el.style, config.style);
 
