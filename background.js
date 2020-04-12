@@ -1,5 +1,5 @@
 function toggleBrowserAction(tabId, url) {
-  if (/^(ftp|file|http|https):\/\//i.test(url)) {
+  if (/^(ftp|file|http|https):\/\/(?!chrome\.google\.com)/i.test(url)) {
     chrome.browserAction.enable(tabId);
   } else {
     chrome.browserAction.disable(tabId);
