@@ -1,5 +1,5 @@
 # run-js-on-page-start
-Google Chrome extension to run javascript code before page starts loading
+Chrome extension to run javascript code before page starts loading
 
 ![alt text](publish-imgs/screen-640x400.png)
 
